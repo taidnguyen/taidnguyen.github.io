@@ -4,7 +4,7 @@ categories: project
 title:  "Big Data Bowl"
 subtitle: "Finalist"
 # date:   2023-01-01 00:00:00 +00:00
-# image: images/DataBowlScreenshot.png
+image: images/DataBowlScreenshot.png
 # course: " Berkeley"
 # author: "Tai Nguyen and Eric Wong"
 # subtitle: "Invited Workshop Talk"
@@ -20,6 +20,6 @@ code: https://github.com/taidnguyen/big-data-bowl-2022
 One of 5 finalists, winning $15,000.
 </p>
 <p>
-We got to meet the Director of Research at the NFL and had a professional video made.
+We got to meet the Director of Research of the NFL and had a professional video made.
 </p>
 

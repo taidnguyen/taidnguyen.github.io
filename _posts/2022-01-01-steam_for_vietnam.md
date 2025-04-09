@@ -4,7 +4,7 @@ categories: project
 title:  "STEAM For Vietnam"
 subtitle: "Volunteer data scientist"
 # date:   2023-01-01 00:00:00 +00:00
-# image: images/DataBowlScreenshot.png
+image: images/s4vlogo.png
 # course: " Berkeley"
 # author: "Tai Nguyen and Eric Wong"
 # subtitle: "Invited Workshop Talk"
@@ -18,7 +18,7 @@ website: https://www.steamforvietnam.org/en/about
 
 ---
 <p>
-During Covid, volunteered as a data engineer for a non-profit that provides free online education for Vietnamese children.
+During Covid, I volunteered as an engineer for a non-profit that provides free online education for Vietnamese children.
 </p>
 
 

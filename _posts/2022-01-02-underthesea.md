@@ -4,7 +4,7 @@ categories: project
 title:  "Underthesea"
 subtitle: "Open-source contributor"
 # date:   2023-01-01 00:00:00 +00:00
-# image: images/underthesea.png
+image: images/underthesea.png
 # course: " Berkeley"
 # author: "Tai Nguyen and Eric Wong"
 # subtitle: "Invited Workshop Talk"
