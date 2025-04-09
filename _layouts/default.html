@@ -57,7 +57,7 @@
             </td>
             <td style="padding:2.5%;width:40%;max-width:40%">
               <!-- <img style="width:80%;max-width:100%" alt="profile photo" src="images/profile.jpg"> -->
-              <figure style="width:100%;margin:0 auto;text-align:center">
+              <figure style="width:100%;margin:auto;text-align:center">
                 <img style="width:80%;max-width:100%" alt="profile photo" src="images/profile.jpg">
                 <figcaption style="font-size:0.7em;color:#555;margin-top:8px;">
                   Photo taken by Grace Pindzola
@@ -96,7 +96,6 @@
               <h3>{{post.title}}</h3>
               <br>
               {{post.authors}}
-
               <br>
               <!-- <em>{{post.venue}}</em>, {{ post.date | date: "%Y" }} -->
               <em>{{post.venue}}</em>
@@ -155,10 +154,10 @@
           {% for cat in post.categories %}
           {% if cat == 'project' %}
           <tr>
-            <td style="padding:1.2%;width:25%;vertical-align:middle;min-width:120px">
+            <!-- <td style="padding:1.2%;width:25%;vertical-align:middle;min-width:120px">
               <img src="/{{post.image}}" alt="project image" style="width:auto; height:auto; max-width:100%;" />
-            </td>
-            <td style="padding:1.2%;width:75%;vertical-align:middle">
+            </td> -->
+            <td style="padding:1.2%;width:75%;vertical-align:left">
               <h3>{{post.title}}</h3>
               {% if post.authors %}
               <br>
@@ -166,9 +165,9 @@
               <!-- <br> -->
               {% endif %}
               <!-- <br>
-              <em>{{post.categories}} {{post.course}}</em>
-              <br> -->
-              <!-- {{ post.date | date: "%Y-%m-%d" }} -->
+              <em>{{post.categories}} {{post.course}}</em>-->
+              <br>
+              {{ post.date | date: "%Y" }}
               <br>
               {% if post.website %}
               <a href="{{post.website}}">website</a> /

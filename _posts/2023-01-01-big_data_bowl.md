@@ -1,10 +1,10 @@
 ---
 layout: post
 categories: project
-title:  "Big Data Bowl 2023"
+title:  "Big Data Bowl"
 subtitle: "Finalist"
 # date:   2023-01-01 00:00:00 +00:00
-image: images/DataBowlScreenshot.png
+# image: images/DataBowlScreenshot.png
 # course: " Berkeley"
 # author: "Tai Nguyen and Eric Wong"
 # subtitle: "Invited Workshop Talk"
