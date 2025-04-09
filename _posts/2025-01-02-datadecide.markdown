@@ -7,11 +7,11 @@ title:  "Predict Best Pretraining Data from Small Experiments"
 # author: "Tai Nguyen and Eric Wong"
 categories: research
 # subtitle: "Invited Workshop Talk"
-venue: "Ongoing 2025"
+venue: "In submission 2025"
 # slides: /pdfs/hands2015.pdf
-authors: Ian Magnusson*, Nguyen Tai*, Ben Bogin*
-# arxiv: https://arxiv.org/abs/2502.13595
-# code: https://github.com/embeddings-benchmark/mteb
-# website: https://huggingface.co/spaces/mteb/leaderboard
+authors: Ian Magnusson*, <strong>Nguyen Tai*</strong>, Ben Bogin*
+arxiv:
+code:
+website:
 ---
 

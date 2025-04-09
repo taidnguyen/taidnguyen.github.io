@@ -12,6 +12,6 @@ venue: "arXiv 2024"
 authors: "<strong>Nguyen Tai</strong>, Eric Wong"
 arxiv: https://arxiv.org/abs/2308.14737
 code: https://github.com/DebugML/incontext_influences
-website: https://debugml.github.io/incontext-influences/
+blog: https://debugml.github.io/incontext-influences/
 ---
 

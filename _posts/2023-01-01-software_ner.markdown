@@ -12,6 +12,6 @@ venue: "ASE 2023"
 authors: "<strong>Tai Nguyen</strong>, Yifeng Di, Joohan Lee, Muhao Chen, Tianyi Zhang"
 arxiv: https://arxiv.org/abs/2308.10564
 code: https://github.com/taidnguyen/software_entity_recognition
-website: https://huggingface.co/taidng/wikiser-bert-base
+huggingface: https://huggingface.co/taidng/wikiser-bert-base
 ---
 
