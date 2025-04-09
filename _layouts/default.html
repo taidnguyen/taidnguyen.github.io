@@ -30,37 +30,42 @@
       <td style="padding:0px">
         <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
           <tr style="padding:0px">
-            <td style="padding:2.5%;width:60%;vertical-align:middle">
+            <td style="padding:1.2%;width:60%;vertical-align:middle">
               <h1>
-                Leonid Keselman
+                Tai Nguyen
               </h1>
-              <p>I am a PhD student at the <a href="https://www.ri.cmu.edu/">Robotics Institute</a>, part of the <a href="https://www.scs.cmu.edu/">School of Computer Science</a> at <a href="https://www.cmu.edu/">Carnegie Mellon University</a>, where I work on 3D computer vision. My PhD advisor is <a href="http://www.cs.cmu.edu/~hebert/">Martial Hebert</a>.
+              <p>I am Tai (Đức Tài), a researcher engineer at Apple . I am working on pushing the boundaries of on-device language models and multimodality.
               </p>
               <p>
-                From 2011 to 2017, I worked at <a href="https://www.intel.com">Intel</a>, as part of <a href="https://www.intelrealsense.com/">Intel RealSense</a>. I primarily designed computer vision algorithms for efficient hardware ASICs, including the Intel RealSense <a href="https://software.intel.com/en-us/articles/realsense-r200-camera">R200</a> and <a href="https://software.intel.com/en-us/realsense/d400">D400</a> RGB-D sensors. Additionally, I worked on <a href="https://github.com/IntelRealSense/librealsense">software APIs</a>, <a href="https://patents.google.com/patent/US9992474B2">active illumination systems</a>, <a href="https://patents.google.com/patent/US9304597">human-computer interaction devices</a>, and helped develop demos for trade shows, including CES 2012-2016.
+                Previously, I got my MS from the University of Pennsylvania, where I got started on research with <a href="https://www.cis.upenn.edu/~exwong/">Eric Wong</a> and <a href="https://www.cis.upenn.edu/~ccb/">Chris Callison-Burch</a>.
+                I was also fortunate to work with <a href="https://benbogin.github.io/">Ben Bogin</a> from Ai2.
               </p>
               <p>
-                I have an MS in Computer Science (AI focus) from <a href="http://cs.stanford.edu">Stanford University</a>, where I was a research assistant for <a href="http://svl.stanford.edu/">Silvio Savarese</a> and a teaching assistant for <a href="http://svl.stanford.edu/">Fei-Fei Li</a> (<a href="http://vision.stanford.edu/teaching/cs131_fall1617/">CS131</a> & <a href="http://cs231n.stanford.edu/2017/">CS231N</a>). I have a BS in EECS from <a href="http://www.eecs.berkeley.edu/">UC Berkeley</a>, where I worked in <a href="https://people.eecs.berkeley.edu/~pister/">Kris Pister's</a> lab.
+                Before that, I spent time at <a href="https://www.ibm.com/topics/mainframe">IBM Systems</a> and studied Economics at the wonderful Haverford College. I wrote my undergraduate <a href="https://scholarship.tricolib.brynmawr.edu/handle/10066/21740">thesis</a> on the impact of Airbnb on welfare. <!-- with <a href="https://www.haverford.edu/users/gparames">Giri Parameswaran</a>.-->
+              </p>
+              <p>
+                I grew up in Saigon, Vietnam. 🇻🇳
               </p>
               <p style="text-align:center">
-                <a target="_blank" href="https://mailhide.io/e/B8TyS"> Email</a> &nbsp;/&nbsp;
-                <a href="https://github.com/leonidk">GitHub</a> &nbsp;/&nbsp;
-                <a href="https://scholar.google.com/citations?user=GCYG4GoAAAAJ">Google Scholar</a> &nbsp;/&nbsp;
-                <a href="https://www.linkedin.com/in/lkeselman"> LinkedIn </a>
+                <!-- <a target="_blank" href="tainguyen7597@gmail.com"> Email</a> &nbsp;/&nbsp; -->
+                <a href="tainguyen7597@gmail.com">Email</a> &nbsp;/&nbsp;
+                <a href="https://github.com/taidnguyen">GitHub</a> &nbsp;/&nbsp;
+                <a href="https://scholar.google.com/citations?user=hR_o5VoAAAAJ">Google Scholar</a> &nbsp;/&nbsp;
+                <a href="https://www.linkedin.com/in/taidnguyen"> LinkedIn </a>
               </p>
             </td>
             <td style="padding:2.5%;width:40%;max-width:40%">
-              <img style="width:100%;max-width:100%" alt="profile photo" src="images/circle_bw_crop.jpg">
+              <img style="width:80%;max-width:100%" alt="profile photo" src="images/tai/profile.jpg">
             </td>
           </tr>
         </table>
 
         <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
           <tr>
-            <td style="padding:2.5%;width:100%;vertical-align:middle">
+            <td style="padding:1.2%;width:100%;vertical-align:middle">
               <h2>Research</h2>
               <p>
-                I'm interested in computer vision, machine learning, optimization, graphics and robotics.
+                I'm interested in many questions around data selection, training, and the science of LLMs.
               </p>
             </td>
           </tr>
@@ -71,16 +76,18 @@
           {% for cat in post.categories %}
           {% if cat == 'research' %}
           <tr>
-            <td style="padding:2.5%;width:25%;vertical-align:middle;min-width:120px">
+            <!-- <td style="padding:2.5%;width:25%;vertical-align:middle;min-width:120px">
               <img src="/tn{{post.image}}" alt="project image" style="width:auto; height:auto; max-width:100%;" />
-            </td>
-            <td style="padding:2.5%;width:75%;vertical-align:middle">
+            </td> -->
+            <!-- <td style="padding:2.5%;width:75%;vertical-align:middle"> -->
+            <td style="padding:1.2%;width:75%;vertical-align:left">
               <h3>{{post.title}}</h3>
               <br>
               {{post.authors}}
 
               <br>
-              <em>{{post.venue}}</em>, {{ post.date | date: "%Y" }}
+              <!-- <em>{{post.venue}}</em>, {{ post.date | date: "%Y" }} -->
+              <em>{{post.venue}}</em>
               <br>
               {% if post.arxiv %}
               <a href="{{post.arxiv}}">arxiv</a> /
@@ -111,10 +118,10 @@
           {% endfor %}
           {% endfor %}
         </table>
+        <!-- <br>
         <br>
-        <br>
-        <br>
-        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+        <br> -->
+        <!-- <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
           <tr>
             <td style="padding:2.5%;width:100%;vertical-align:middle">
               <h2>Intel Projects</h2>
@@ -127,7 +134,7 @@
 
           {% for post in site.posts %}
           {% for cat in post.categories %}
-          {% if cat == 'Intel' %}
+          {% if cat == 'project' %}
           <tr>
             <td style="padding:2.5%;width:25%;vertical-align:middle;min-width:120px">
               <img src="/tn{{post.image}}" alt="project image" style="width:auto; height:auto; max-width:100%;" />
@@ -180,12 +187,12 @@
         </table>
         <br>
         <br>
-        <br>
-        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+        <br> -->
+        <!-- <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
           <tr>
             <td style="padding:2.5%;width:100%;vertical-align:middle">
               <h2>Other Projects</h2>
-              <p> These include coursework, side projects and unpublished research work. 
+              <p> These include coursework, side projects and unpublished research work.
               </p>
             </td>
           </tr>
@@ -244,7 +251,7 @@
           {% endif %}
           {% endfor %}
           {% endfor %}
-        </table>
+        </table> -->
 
         <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
           <tr>

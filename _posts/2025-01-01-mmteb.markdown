@@ -1,0 +1,17 @@
+---
+layout: post
+title:  "MMTEB: Massive Multilingual Text Embedding Benchmark"
+# date:   2024-01-02 00:00:00 +00:00
+# image: /images/gina-motes.jpg
+# course: " Berkeley"
+# author: "Tai Nguyen and Eric Wong"
+categories: research
+# subtitle: "Invited Workshop Talk"
+venue: "ICLR 2025"
+# slides: /pdfs/hands2015.pdf
+authors: <i>(82 authors)</i> Kenneth Enevoldsen, ... <strong>Nguyen Tai</strong>..., Niklas Muennighoff
+arxiv: https://arxiv.org/abs/2502.13595
+code: https://github.com/embeddings-benchmark/mteb
+website: https://huggingface.co/spaces/mteb/leaderboard
+---
+
