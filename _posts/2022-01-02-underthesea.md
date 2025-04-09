@@ -14,4 +14,4 @@ website: https://undertheseanlp.com/#!/
 code: https://github.com/undertheseanlp/underthesea
 
 ---
-I contributed a small amount to an awesome open-source Vietnamese toolkit, which helped me get started on NLP.
+I contributed a small amount to an open-source Vietnamese toolkit built by the amazing <a href="https://github.com/rain1024">Anh Vu</a>, which helped me get started on NLP.
