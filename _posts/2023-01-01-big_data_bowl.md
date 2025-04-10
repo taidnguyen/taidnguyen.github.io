@@ -16,10 +16,5 @@ writeup: https://jrudoler.com/blog/big-data-bowl/
 code: https://github.com/taidnguyen/big-data-bowl-2022
 
 ---
-<p>
-One of 5 finalists, winning $15,000.
-</p>
-<p>
-We got to meet the Director of Research of the NFL and had a professional video made.
-</p>
+One of 5 finalists, winning $15,000. We got to meet the Director of Research of the NFL and had a professional video made.
 

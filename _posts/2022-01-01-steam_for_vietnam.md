@@ -18,7 +18,7 @@ website: https://www.steamforvietnam.org/en/about
 
 ---
 <p>
-During Covid, I volunteered as an engineer for a non-profit that provides free online education for Vietnamese children.
+During Covid, I volunteered for a non-profit that provides free online education for Vietnamese children. I worked on the data science team.
 </p>
 
 
