@@ -10,7 +10,7 @@ categories: research
 venue: "arXiv 2024"
 # slides: /pdfs/hands2015.pdf
 authors: "<strong>Nguyen Tai</strong>, Eric Wong"
-arxiv: https://arxiv.org/abs/2308.14737
+arxiv: https://arxiv.org/abs/2302.11042
 code: https://github.com/DebugML/incontext_influences
 blog: https://debugml.github.io/incontext-influences/
 ---
