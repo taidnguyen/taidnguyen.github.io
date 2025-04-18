@@ -14,5 +14,6 @@ arxiv: https://arxiv.org/abs/2504.11393
 code: https://github.com/allenai/DataDecide/tree/main
 blog: https://allenai.org/blog/datadecide
 huggingface: https://huggingface.co/collections/allenai/datadecide-67edb1d2bacba40b5d3ed633
+new: true
 ---
 
