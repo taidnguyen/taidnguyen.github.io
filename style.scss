@@ -103,3 +103,12 @@ span.highlight {
 // ... Otherwise it really bloats up the top of the CSS file and makes it difficult to find the start
 //@import "highlights";
 //@import "svg-icons";
+
+.oral {
+  color: white;
+  background-color: #7e57c2; /* Bootstrap danger red */
+  padding: 2px 2px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
