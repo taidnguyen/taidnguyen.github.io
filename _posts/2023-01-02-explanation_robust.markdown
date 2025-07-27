@@ -9,7 +9,7 @@ categories: research
 # subtitle: "Invited Workshop Talk"
 venue: "ACL 2023"
 # slides: /pdfs/hands2015.pdf
-authors: "Josh Magnus Ludan, Yixuan Meng*, <strong>Tai Nguyen*</strong>, Saurabh Shah, Qing Lyu, Marianna Apidianaki, Chris Callison-Burch"
+authors: "Josh Magnus Ludan, Yixuan Meng*, <strong>Tai Nguyen*</strong>, Saurabh Shah*, Qing Lyu, Marianna Apidianaki, Chris Callison-Burch"
 arxiv: https://arxiv.org/abs/2305.04990
 code: https://github.com/taidnguyen/explanation-based_finetuning
 # website: https://debugml.github.io/incontext-influences/
