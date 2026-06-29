@@ -12,7 +12,7 @@ image: images/DataBowlScreenshot.png
 authors: "Ryan Brill, Joseph Rudoler, <strong>Tai Nguyen</strong>, Ryan Gross"
 video: https://www.nfl.com/videos/2022-big-data-bowl-ryan-gross-joseph-rudoler-tai-nguyen-ryan-brill
 feature: https://ai-analytics.wharton.upenn.edu/news/from-seahawks-fan-to-2022-nfl-big-data-bowl-finalist/
-writeup: https://jrudoler.com/blog/big-data-bowl/
+website: https://jrudoler.com/blog/big-data-bowl/
 code: https://github.com/taidnguyen/big-data-bowl-2022
 
 ---

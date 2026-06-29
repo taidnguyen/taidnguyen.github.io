@@ -55,8 +55,7 @@ url: "https://taidnguyen.github.io" # the base hostname & protocol for your site
 # !! You don't need to change any of the configuration flags below !!
 #
 
-#permalink: /:title/
-permalink: /
+permalink: /blog/:title/
 
 
 # The release of Jekyll Now that you're using
@@ -79,7 +78,7 @@ sass:
 # Use the following plug-ins
 plugins:
       - jekyll-sitemap # Create a sitemap using the official Jekyll sitemap gem
-    #  - jekyll-feed # Create an Atom feed using the official Jekyll feed gem
+      - jekyll-feed # Create an Atom feed using the official Jekyll feed gem
 
 # Exclude these files from your production _site
 exclude:

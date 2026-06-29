@@ -22,6 +22,7 @@
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
   <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
 
+  {% feed_meta %}
 </head>
 
 <body>
@@ -41,10 +42,10 @@
                 I was also fortunate to work with <a href="https://benbogin.github.io/">Ben Bogin</a> from Ai2.
               </p>
               <p>
-                Before that, I helped build an analytics tool to support mainframes at <a href="https://www.ibm.com/topics/mainframe">IBM Systems</a>. I studied Economics at the wonderful Haverford College and wrote my undergraduate <a href="https://scholarship.tricolib.brynmawr.edu/handle/10066/21740">thesis</a> on the impact of Airbnb on welfare. <!-- with <a href="https://www.haverford.edu/users/gparames">Giri Parameswaran</a>.-->
+                Before that, I helped build an analytics tool to help detect and diagnose mainframe server failures at <a href="https://www.ibm.com/topics/mainframe">IBM Systems</a>. I studied Economics at the wonderful Haverford College and wrote my undergraduate <a href="https://scholarship.tricolib.brynmawr.edu/handle/10066/21740">thesis</a> on the impact of Airbnb on welfare. <!-- with <a href="https://www.haverford.edu/users/gparames">Giri Parameswaran</a>.-->
               </p>
               <p>
-                I grew up in Saigon, Vietnam. 🇻🇳
+                I grew up in Saigon, Vietnam 🇻🇳.
               </p>
               <p style="text-align:center">
                 <!-- <a target="_blank" href="tainguyen7597@gmail.com"> Email</a> &nbsp;/&nbsp; -->
@@ -70,17 +71,107 @@
 
         <!-- <br> -->
 
+        <style>
+          .wtab { background:none;border:none;border-bottom:2px solid transparent;font-family:inherit;font-size:14px;font-weight:700;color:#999;padding:3px 10px 5px;cursor:pointer; }
+          .wtab.active { color:#111;border-bottom-color:#111; }
+          .wtab:hover { color:#111; }
+        </style>
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+          <tr>
+            <td style="padding:0.7%;width:100%;vertical-align:middle">
+              <h2 style="margin-block-end:6px;">Writing</h2>
+              <div>
+                <button id="tab-ai" class="wtab active" onclick="showTab('ai')">AI</button>
+                <button id="tab-personal" class="wtab" onclick="showTab('personal')">Personal</button>
+                <!-- <a href="/blog/" style="font-size:12px;margin-left:8px;color:#555;">see all</a> -->
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        {% assign blog_posts = site.posts | where: "categories", "blog" %}
+        {% assign ai_posts = blog_posts | where_exp: "p", "p.topic != 'personal'" %}
+        {% assign personal_posts = blog_posts | where: "topic", "personal" %}
+
+        <div id="list-ai">
+          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+            {% for post in ai_posts limit:5 %}
+            <tr>
+              <td style="padding:0.7%;vertical-align:top;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  {% if post.thumbnail %}
+                  <img src="{{ post.thumbnail }}" alt="" style="width:40px;height:40px;object-fit:contain;flex-shrink:0;">
+                  {% endif %}
+                  <div>
+                    <p style="margin:0 0 2px 0;">
+                      <a href="{{ post.url }}" style="font-weight:700;font-size:14px;">{{ post.title }}</a>
+                      <span style="color:#555;font-size:12px;margin-left:6px;">{{ post.date | date: "%b %Y" }}</span>
+                    </p>
+                    {% if post.description %}
+                    <p style="font-size:13px;margin:0;color:#333;">{{ post.description }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+            {% if ai_posts.size == 0 %}
+            <tr><td style="padding:0.7%;"><p style="color:#555;font-size:13px;">Coming soon.</p></td></tr>
+            {% endif %}
+            {% if ai_posts.size > 5 %}
+            <tr><td style="padding:0.7%;"><p style="font-size:13px;"><a href="/blog/">See all</a></p></td></tr>
+            {% endif %}
+          </table>
+        </div>
+
+        <div id="list-personal" style="display:none;">
+          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+            {% for post in personal_posts limit:5 %}
+            <tr>
+              <td style="padding:0.7%;vertical-align:top;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  {% if post.thumbnail %}
+                  <img src="{{ post.thumbnail }}" alt="" style="width:40px;height:40px;object-fit:contain;flex-shrink:0;">
+                  {% endif %}
+                  <div>
+                    <p style="margin:0 0 2px 0;">
+                      <a href="{{ post.url }}" style="font-weight:700;font-size:14px;">{{ post.title }}</a>
+                      <span style="color:#555;font-size:12px;margin-left:6px;">{{ post.date | date: "%b %Y" }}</span>
+                    </p>
+                    {% if post.description %}
+                    <p style="font-size:13px;margin:0;color:#333;">{{ post.description }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+            {% if personal_posts.size == 0 %}
+            <tr><td style="padding:0.7%;"><p style="color:#555;font-size:13px;">Coming soon.</p></td></tr>
+            {% endif %}
+            {% if personal_posts.size > 5 %}
+            <tr><td style="padding:0.7%;"><p style="font-size:13px;"><a href="/blog/">See all</a></p></td></tr>
+            {% endif %}
+          </table>
+        </div>
+
+        <script>
+          function showTab(t) {
+            document.getElementById('list-ai').style.display = (t === 'ai') ? '' : 'none';
+            document.getElementById('list-personal').style.display = (t === 'personal') ? '' : 'none';
+            document.getElementById('tab-ai').classList.toggle('active', t === 'ai');
+            document.getElementById('tab-personal').classList.toggle('active', t === 'personal');
+          }
+        </script>
+        <br>
         <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
           <tr>
             <td style="padding:0.7%;width:100%;vertical-align:middle">
               <h2>Research</h2>
+              <p style="font-size:11px;margin:-4px 0 0 0;">(*: equal contribution)</p>
               <!-- <p>
                 I'm interested in many questions around training data and the science of LLMs.
               </p> -->
-              <br>
-              <small>
-                (*: equal contribution)
-              </small>
             </td>
           </tr>
         </table>
@@ -131,7 +222,7 @@
               {% endif %}
               {% if post.press %}
               <a href="{{post.press}}">press</a> /
-              {% endif %}               
+              {% endif %}
               {% if post.youtube %}
               <a href="{{post.youtube}}">youtube</a> /
               {% endif %}
@@ -149,7 +240,7 @@
         <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
           <tr>
             <td style="padding:0.7%;width:100%;vertical-align:middle">
-              <h2>Projects</h2>
+              <h2>Past projects</h2>
               <!-- <p>
                 Besides my work on the RealSense depth sensors and the publications above, a sampling of my publicly disclosed work
               </p> -->
@@ -162,62 +253,57 @@
           {% for cat in post.categories %}
           {% if cat == 'project' %}
           <tr>
-            <!-- <td style="padding:1.2%;width:25%;vertical-align:middle;min-width:120px">
-              <img src="/{{post.image}}" alt="project image" style="width:auto; height:auto; max-width:100%;" />
-            </td> -->
-            <td style="padding:0.7%;width:75%;vertical-align:left">
-              <h3>{{post.title}}</h3>
-              {% if post.authors %}
-              <br>
-              {{post.authors}}
-              <!-- <br> -->
-              {% endif %}
-              <!-- <br>
-              <em>{{post.categories}} {{post.course}}</em>-->
-              <br>
-              {{ post.date | date: "%Y" }}
-              <br>
-              {% if post.website %}
-              <a href="{{post.website}}">website</a> /
-              {% endif %}
-              {% if post.paper%}
-              <a href="{{post.paper}}">paper</a> /
-              {% endif %}
-              {% if post.writeup%}
-              <a href="{{post.writeup}}">writeup</a> /
-              {% endif %}
-              {% if post.patent %}
-              <a href="{{post.patent}}">patent</a> /
-              {% endif %}
-              {% if post.patent2 %}
-              <a href="{{post.patent2}}">patent #2</a> /
-              {% endif %}
-              {% if post.patent3 %}
-              <a href="{{post.patent3}}">patent #3</a> /
-              {% endif %}
-              {% if post.video %}
-              <a href="{{post.video}}">video</a> /
-              {% endif %}
-              {% if post.video2 %}
-              <a href="{{post.video2}}">video #2</a> /
-              {% endif %}
-              {% if post.code %}
-              <a href="{{post.code}}">code</a> /
-              {% endif %}
-              {% if post.feature %}
-              <a href="{{post.feature}}">feature article</a> /
-              {% endif %}
-              {% if post.poster %}
-              <a href="{{post.poster}}">poster</a> /
-              {% endif %}
-              {% if post.press %}
-              <a href="{{post.press}}">press</a> /
-              {% endif %}              
-              {% if post.slides %}
-              <a href="{{post.slides}}">slides</a> /
-              {% endif %}
-              <p></p>
-              {{ post.excerpt }}
+            <td style="padding:2px 6px;vertical-align:top;">
+              <p style="margin:4px 0;">
+                {% if post.website %}
+                <a href="{{post.website}}" style="font-weight:700;">{{post.title}}</a>
+                {% else %}
+                <span style="font-weight:700;">{{post.title}}</span>
+                {% endif %}
+                <span style="color:#555;font-size:12px;margin-left:6px;">{{ post.date | date: "%Y" }}</span>
+                — {{ post.excerpt | strip_html | strip }}
+                {% assign has_links = false %}
+                {% if post.video %}{% assign has_links = true %}{% endif %}
+                {% if post.code %}{% assign has_links = true %}{% endif %}
+                {% if post.feature %}{% assign has_links = true %}{% endif %}
+                {% if post.paper %}{% assign has_links = true %}{% endif %}
+                {% if post.patent %}{% assign has_links = true %}{% endif %}
+                {% if post.poster %}{% assign has_links = true %}{% endif %}
+                {% if post.press %}{% assign has_links = true %}{% endif %}
+                {% if post.slides %}{% assign has_links = true %}{% endif %}
+                {% if post.writeup %}{% assign has_links = true %}{% endif %}
+                {% if has_links %}
+                <br><span style="font-size:12px;">
+                {% if post.video %}
+                <a href="{{post.video}}">video</a> /
+                {% endif %}
+                {% if post.writeup %}
+                <a href="{{post.writeup}}">writeup</a> /
+                {% endif %}
+                {% if post.code %}
+                <a href="{{post.code}}">code</a> /
+                {% endif %}
+                {% if post.feature %}
+                <a href="{{post.feature}}">feature article</a> /
+                {% endif %}
+                {% if post.paper %}
+                <a href="{{post.paper}}">paper</a> /
+                {% endif %}
+                {% if post.patent %}
+                <a href="{{post.patent}}">patent</a> /
+                {% endif %}
+                {% if post.poster %}
+                <a href="{{post.poster}}">poster</a> /
+                {% endif %}
+                {% if post.press %}
+                <a href="{{post.press}}">press</a> /
+                {% endif %}
+                {% if post.slides %}
+                <a href="{{post.slides}}">slides</a> /
+                {% endif %}
+                </span>
+                {% endif %}
+              </p>
             </td>
           </tr>
           {% endif %}

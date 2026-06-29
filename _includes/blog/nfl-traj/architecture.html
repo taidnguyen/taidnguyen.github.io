@@ -1,0 +1,162 @@
+<div class="diagram" style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap;align-items:start;">
+
+<!-- ENCODER -->
+<div style="text-align:center;">
+<svg viewBox="0 0 260 440" xmlns="http://www.w3.org/2000/svg" width="260" height="440" style="max-width:260px;height:auto;font-family:'Lato',sans-serif;">
+  <rect x="0" y="0" width="260" height="440" fill="white"/>
+  <text x="130" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#333">Encoder</text>
+
+  <!-- Input -->
+  <rect x="30" y="30" width="200" height="28" rx="3" fill="#e8f4fd" stroke="#1772d0" stroke-width="1"/>
+  <text x="130" y="48" text-anchor="middle" font-size="10" fill="#1772d0">Tracking + Static Features</text>
+
+  <line x1="130" y1="58" x2="130" y2="74" stroke="#999" stroke-width="1" marker-end="url(#ae)"/>
+
+  <!-- Player Encoder -->
+  <rect x="30" y="74" width="200" height="26" rx="3" fill="#f6f8fa" stroke="#888" stroke-width="1"/>
+  <text x="130" y="91" text-anchor="middle" font-size="10" fill="#333">Player Encoder</text>
+
+  <line x1="130" y1="100" x2="130" y2="118" stroke="#999" stroke-width="1" marker-end="url(#ae)"/>
+
+  <!-- Spatial block -->
+  <rect x="30" y="118" width="200" height="108" rx="4" fill="none" stroke="#c0392b" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="238" y="176" text-anchor="start" font-size="11" font-weight="700" fill="#c0392b">x4</text>
+
+  <rect x="50" y="128" width="160" height="26" rx="3" fill="#fff5f5" stroke="#c0392b" stroke-width="1"/>
+  <text x="130" y="145" text-anchor="middle" font-size="10" font-weight="600" fill="#c0392b">Spatial Multi-Head Attn</text>
+  <line x1="130" y1="154" x2="130" y2="164" stroke="#999" stroke-width="1" marker-end="url(#ae)"/>
+  <rect x="50" y="164" width="160" height="18" rx="3" fill="#f6f8fa" stroke="#bbb" stroke-width="0.8"/>
+  <text x="130" y="176" text-anchor="middle" font-size="9" fill="#666">Add & Norm</text>
+  <line x1="130" y1="182" x2="130" y2="192" stroke="#999" stroke-width="1" marker-end="url(#ae)"/>
+  <rect x="50" y="192" width="160" height="22" rx="3" fill="#fff5f5" stroke="#c0392b" stroke-width="0.8"/>
+  <text x="130" y="207" text-anchor="middle" font-size="10" fill="#c0392b">Feed Forward + Norm</text>
+
+  <line x1="130" y1="226" x2="130" y2="244" stroke="#999" stroke-width="1" marker-end="url(#ae)"/>
+
+  <!-- Temporal block -->
+  <rect x="30" y="244" width="200" height="108" rx="4" fill="none" stroke="#1772d0" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="238" y="302" text-anchor="start" font-size="11" font-weight="700" fill="#1772d0">x4</text>
+
+  <rect x="50" y="254" width="160" height="26" rx="3" fill="#f0f7ff" stroke="#1772d0" stroke-width="1"/>
+  <text x="130" y="271" text-anchor="middle" font-size="10" font-weight="600" fill="#1772d0">Temporal Attn + RoPE</text>
+  <line x1="130" y1="280" x2="130" y2="290" stroke="#999" stroke-width="1" marker-end="url(#ae)"/>
+  <rect x="50" y="290" width="160" height="18" rx="3" fill="#f6f8fa" stroke="#bbb" stroke-width="0.8"/>
+  <text x="130" y="302" text-anchor="middle" font-size="9" fill="#666">Add & Norm</text>
+  <line x1="130" y1="308" x2="130" y2="318" stroke="#999" stroke-width="1" marker-end="url(#ae)"/>
+  <rect x="50" y="318" width="160" height="22" rx="3" fill="#f0f7ff" stroke="#1772d0" stroke-width="0.8"/>
+  <text x="130" y="333" text-anchor="middle" font-size="10" fill="#1772d0">Feed Forward + Norm</text>
+
+  <line x1="130" y1="352" x2="130" y2="370" stroke="#999" stroke-width="1" marker-end="url(#ae)"/>
+
+  <!-- Output -->
+  <rect x="30" y="370" width="200" height="28" rx="3" fill="#f6f8fa" stroke="#888" stroke-width="1"/>
+  <text x="130" y="388" text-anchor="middle" font-size="10" font-weight="600" fill="#333">Encoded (B, T, P, D)</text>
+
+  <defs>
+    <marker id="ae" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999"/>
+    </marker>
+  </defs>
+</svg>
+</div>
+
+<!-- DECODER -->
+<div style="text-align:center;">
+<svg viewBox="0 0 340 520" xmlns="http://www.w3.org/2000/svg" width="340" height="520" style="max-width:340px;height:auto;font-family:'Lato',sans-serif;">
+  <rect x="0" y="0" width="320" height="520" fill="white"/>
+  <text x="160" y="18" text-anchor="middle" font-size="13" font-weight="700" fill="#333">Decoder</text>
+
+  <!-- Two inputs side by side -->
+  <rect x="10" y="34" width="140" height="44" rx="3" fill="#fff8f0" stroke="#f09228" stroke-width="1"/>
+  <text x="80" y="51" text-anchor="middle" font-size="9" font-weight="600" fill="#f09228">Target's encoded frames</text>
+  <text x="80" y="64" text-anchor="middle" font-size="8" fill="#999">keys & values (B, T, D)</text>
+
+  <rect x="170" y="34" width="140" height="44" rx="3" fill="#f0fff4" stroke="#2ea043" stroke-width="1"/>
+  <text x="240" y="51" text-anchor="middle" font-size="9" font-weight="600" fill="#2ea043">21 learned queries</text>
+  <text x="240" y="64" text-anchor="middle" font-size="8" fill="#999">one per future frame (21, D)</text>
+
+  <!-- Queries arrow down into the block -->
+  <line x1="240" y1="78" x2="240" y2="100" stroke="#2ea043" stroke-width="1" marker-end="url(#ad)"/>
+
+  <!-- Memory arrow entering cross-attention from left side -->
+  <line x1="80" y1="78" x2="80" y2="200" stroke="#f09228" stroke-width="1"/>
+  <line x1="80" y1="200" x2="104" y2="200" stroke="#f09228" stroke-width="1" marker-end="url(#ad)"/>
+
+  <!-- Decoder block (dashed green) -->
+  <rect x="100" y="100" width="210" height="260" rx="5" fill="none" stroke="#2ea043" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <text x="316" y="234" text-anchor="start" font-size="13" font-weight="700" fill="#2ea043">x2</text>
+
+  <!-- Self-Attention on queries -->
+  <rect x="120" y="112" width="170" height="26" rx="3" fill="#f0fff4" stroke="#2ea043" stroke-width="1"/>
+  <text x="205" y="129" text-anchor="middle" font-size="10" font-weight="600" fill="#2ea043">Self-Attention</text>
+  <text x="205" y="144" text-anchor="middle" font-size="8" fill="#999">queries attend to each other</text>
+
+  <line x1="205" y1="148" x2="205" y2="164" stroke="#999" stroke-width="1" marker-end="url(#ad)"/>
+
+  <!-- Add & Norm -->
+  <rect x="120" y="164" width="170" height="16" rx="3" fill="#f6f8fa" stroke="#bbb" stroke-width="0.8"/>
+  <text x="205" y="175" text-anchor="middle" font-size="8" fill="#666">Add & Norm</text>
+
+  <line x1="205" y1="180" x2="205" y2="192" stroke="#999" stroke-width="1" marker-end="url(#ad)"/>
+
+  <!-- Cross-Attention -->
+  <rect x="120" y="192" width="170" height="26" rx="3" fill="#f0fff4" stroke="#2ea043" stroke-width="1"/>
+  <text x="205" y="209" text-anchor="middle" font-size="10" font-weight="600" fill="#2ea043">Cross-Attention</text>
+  <!-- Label showing Q and K,V -->
+  <text x="205" y="224" text-anchor="middle" font-size="8" fill="#999">Q = queries, K/V = target frames</text>
+
+  <line x1="205" y1="228" x2="205" y2="240" stroke="#999" stroke-width="1" marker-end="url(#ad)"/>
+
+  <!-- Add & Norm -->
+  <rect x="120" y="240" width="170" height="16" rx="3" fill="#f6f8fa" stroke="#bbb" stroke-width="0.8"/>
+  <text x="205" y="251" text-anchor="middle" font-size="8" fill="#666">Add & Norm</text>
+
+  <line x1="205" y1="256" x2="205" y2="268" stroke="#999" stroke-width="1" marker-end="url(#ad)"/>
+
+  <!-- Feed Forward -->
+  <rect x="120" y="268" width="170" height="26" rx="3" fill="#f0fff4" stroke="#2ea043" stroke-width="1"/>
+  <text x="205" y="285" text-anchor="middle" font-size="10" fill="#2ea043">Feed Forward</text>
+
+  <line x1="205" y1="294" x2="205" y2="306" stroke="#999" stroke-width="1" marker-end="url(#ad)"/>
+
+  <!-- Add & Norm -->
+  <rect x="120" y="306" width="170" height="16" rx="3" fill="#f6f8fa" stroke="#bbb" stroke-width="0.8"/>
+  <text x="205" y="317" text-anchor="middle" font-size="8" fill="#666">Add & Norm</text>
+
+  <!-- End of green block -->
+
+  <line x1="205" y1="360" x2="205" y2="380" stroke="#999" stroke-width="1" marker-end="url(#ad)"/>
+
+  <!-- Linear projection -->
+  <rect x="110" y="380" width="190" height="26" rx="3" fill="#f6f8fa" stroke="#888" stroke-width="1"/>
+  <text x="205" y="397" text-anchor="middle" font-size="10" font-weight="600" fill="#333">Linear → (B, 21, 2)</text>
+
+  <line x1="205" y1="406" x2="205" y2="424" stroke="#999" stroke-width="1" marker-end="url(#ad)"/>
+
+  <!-- Output: 21 predicted positions -->
+  <rect x="50" y="424" width="260" height="50" rx="4" fill="#fff8f0" stroke="#f09228" stroke-width="1.5"/>
+  <text x="180" y="442" text-anchor="middle" font-size="10" font-weight="600" fill="#f09228">21 predicted (x, y) positions</text>
+  <!-- Mini trajectory dots -->
+  <circle cx="75" cy="462" r="4" fill="#f09228"/>
+  <circle cx="95" cy="460" r="4" fill="#f09228" opacity="0.9"/>
+  <circle cx="115" cy="457" r="4" fill="#f09228" opacity="0.8"/>
+  <circle cx="135" cy="453" r="4" fill="#f09228" opacity="0.7"/>
+  <circle cx="155" cy="450" r="4" fill="#f09228" opacity="0.65"/>
+  <circle cx="175" cy="448" r="4" fill="#f09228" opacity="0.6"/>
+  <circle cx="195" cy="447" r="4" fill="#f09228" opacity="0.55"/>
+  <circle cx="215" cy="448" r="4" fill="#f09228" opacity="0.5"/>
+  <circle cx="235" cy="450" r="4" fill="#f09228" opacity="0.45"/>
+  <circle cx="255" cy="454" r="4" fill="#f09228" opacity="0.4"/>
+  <circle cx="275" cy="459" r="4" fill="#f09228" opacity="0.35"/>
+
+  <defs>
+    <marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999"/>
+    </marker>
+  </defs>
+</svg>
+</div>
+
+<p style="text-align:center;font-family:'Lato',sans-serif;font-size:13px;color:#666;font-style:italic;max-width:600px;margin:8px auto 0;">The encoder alternates spatial attention (all players per frame) and temporal attention (all frames per player, with <a href="#rope" style="color:#1772d0;">RoPE</a>). The decoder uses 21 learned queries, one per future frame, that cross-attend to the target receiver's encoded history.</p>
+
+</div>

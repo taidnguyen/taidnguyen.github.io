@@ -1,0 +1,152 @@
+<div style="margin:28px 0;">
+<canvas id="field-overview" width="700" height="330" style="display:block;margin:0 auto;max-width:100%;border:1px solid #e0e0e0;border-radius:6px;background:#fff;"></canvas>
+<div style="text-align:center;font-family:'Lato',sans-serif;font-size:13px;color:#666;margin-top:8px;font-style:italic;">
+  A passing play: the model observes tracking data for all players, then predicts the target's trajectory.
+</div>
+</div>
+<script>
+(function(){
+  var c=document.getElementById('field-overview');
+  var ctx=c.getContext('2d');
+  var dpr=window.devicePixelRatio||1;
+  var cssW=c.width, cssH=c.height;
+  c.width=cssW*dpr;c.height=cssH*dpr;
+  c.style.width=cssW+'px';c.style.height=cssH+'px';
+  ctx.scale(dpr,dpr);
+  var ml=40,mr=10,mt=10,mb=20,fw=cssW-ml-mr,fh=cssH-mt-mb;
+  function tx(x){return ml+(x/120)*fw;}
+  function ty(y){return mt+(1-y/53.3)*fh;}
+
+  // Field
+  ctx.fillStyle='rgba(58,125,68,0.10)';ctx.fillRect(ml,mt,fw,fh);
+  ctx.strokeStyle='rgba(58,125,68,0.25)';ctx.lineWidth=0.5;
+  for(var yd=10;yd<=110;yd+=10){ctx.beginPath();ctx.moveTo(tx(yd),mt);ctx.lineTo(tx(yd),mt+fh);ctx.stroke();}
+  ctx.fillStyle='rgba(58,125,68,0.05)';
+  ctx.fillRect(ml,mt,tx(10)-ml,fh);ctx.fillRect(tx(110),mt,tx(120)-tx(110),fh);
+  ctx.fillStyle='#bbb';ctx.font='9px Lato,sans-serif';ctx.textAlign='center';
+  for(var yd=10;yd<=110;yd+=10){var l=yd<=50?yd:120-yd;ctx.fillText(l,tx(yd),mt+fh+13);}
+
+  // Helpers
+  function dot(x,y,r,color,label,ring){
+    var cx=tx(x),cy=ty(y);
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+    if(ring){ctx.beginPath();ctx.arc(cx,cy,r+4,0,Math.PI*2);ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();}
+    if(label){ctx.fillStyle='#fff';ctx.font='bold 9px Lato,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,cx,cy);}
+  }
+  function drawLine(pts,color,width,dash,alpha){
+    ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash||[]);ctx.globalAlpha=alpha||1;
+    ctx.beginPath();ctx.moveTo(tx(pts[0].x),ty(pts[0].y));
+    for(var i=1;i<pts.length;i++)ctx.lineTo(tx(pts[i].x),ty(pts[i].y));
+    ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  }
+  function transition(x,y,color){
+    var cx=tx(x),cy=ty(y);
+    ctx.beginPath();ctx.arc(cx,cy,6,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,6,0,Math.PI*2);ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
+  }
+  function drawGlow(pts,color){
+    // Glow: wide, faint
+    ctx.strokeStyle=color;ctx.lineWidth=7;ctx.globalAlpha=0.15;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(tx(pts[0].x),ty(pts[0].y));
+    for(var i=1;i<pts.length;i++)ctx.lineTo(tx(pts[i].x),ty(pts[i].y));
+    ctx.stroke();
+    // Core: crisp
+    ctx.lineWidth=2.5;ctx.globalAlpha=1;
+    ctx.beginPath();ctx.moveTo(tx(pts[0].x),ty(pts[0].y));
+    for(var i=1;i<pts.length;i++)ctx.lineTo(tx(pts[i].x),ty(pts[i].y));
+    ctx.stroke();ctx.lineCap='butt';
+  }
+
+  function drawPoints(pts,color,r){
+    ctx.fillStyle=color;
+    for(var i=0;i<pts.length;i++){
+      ctx.beginPath();ctx.arc(tx(pts[i].x),ty(pts[i].y),r||3,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  // Offense (blue)
+  dot(35,26.7,9,'#1772d0','QB');
+  dot(36,20,9,'#1772d0','RB');
+  dot(37,33,9,'#1772d0','WR');
+  dot(37,14,9,'#1772d0','WR');
+  dot(37,40,9,'#1772d0','TE');
+
+  // Defense (red)
+  dot(39,33,9,'#c0392b','CB');
+  dot(42,26.7,9,'#c0392b','ILB');
+  dot(48,20,9,'#c0392b','FS');
+
+  // Target receiver (blue with ring)
+  dot(37,8,9,'#1772d0','WR',true);
+
+  // Target CB trailing the receiver (red with ring)
+  dot(39,14,9,'#c0392b','CB',true);
+
+  // --- WR paths ---
+  // Input (data points)
+  var wrInput=[{x:37,y:8},{x:39,y:7.5},{x:42,y:7},{x:46,y:7.2},{x:50,y:8},{x:54,y:10}];
+  drawPoints(wrInput,'#1772d0',3);
+
+  // Transition marker
+  transition(54,10,'#1772d0');
+
+  // Actual future (dashed, faded)
+  var wrActual=[{x:54,y:10},{x:58,y:13},{x:62,y:17},{x:65,y:21},{x:67,y:25},{x:68,y:29}];
+  drawLine(wrActual,'#1772d0',2,[6,4],0.45);
+  ctx.globalAlpha=0.45;dot(wrActual[wrActual.length-1].x,wrActual[wrActual.length-1].y,4,'#1772d0');ctx.globalAlpha=1;
+
+  // Predicted future (solid)
+  var wrPred=[{x:54,y:10},{x:58,y:12.5},{x:62,y:16},{x:66,y:20},{x:69,y:24},{x:71,y:27}];
+  drawLine(wrPred,'#1772d0',2.5);
+  dot(wrPred[wrPred.length-1].x,wrPred[wrPred.length-1].y,5,'#1772d0');
+
+  // --- CB paths ---
+  // Input (data points)
+  var cbInput=[{x:39,y:14},{x:41,y:12},{x:44,y:10.5},{x:48,y:10},{x:52,y:11},{x:55,y:13}];
+  drawPoints(cbInput,'#c0392b',3);
+
+  // Transition marker
+  transition(55,13,'#c0392b');
+
+  // Actual future (dashed, faded)
+  var cbActual=[{x:55,y:13},{x:59,y:16},{x:63,y:19.5},{x:66,y:23},{x:68,y:27},{x:69,y:31}];
+  drawLine(cbActual,'#c0392b',2,[6,4],0.45);
+  ctx.globalAlpha=0.45;dot(cbActual[cbActual.length-1].x,cbActual[cbActual.length-1].y,4,'#c0392b');ctx.globalAlpha=1;
+
+  // Predicted future (solid)
+  var cbPred=[{x:55,y:13},{x:59,y:15.5},{x:63,y:18},{x:67,y:21},{x:70,y:25},{x:72,y:28}];
+  drawLine(cbPred,'#c0392b',2.5);
+  dot(cbPred[cbPred.length-1].x,cbPred[cbPred.length-1].y,5,'#c0392b');
+
+  // Prediction boundary line (dashed black)
+  var bx=tx(54);
+  ctx.strokeStyle='#333';ctx.lineWidth=1;ctx.setLineDash([5,4]);ctx.globalAlpha=0.35;
+  ctx.beginPath();ctx.moveTo(bx,mt+5);ctx.lineTo(bx,mt+fh-5);ctx.stroke();
+  ctx.globalAlpha=1;ctx.setLineDash([]);
+
+  // Labels for boundary
+  ctx.font='11px Lato,sans-serif';ctx.textAlign='center';
+  ctx.fillStyle='#666';ctx.fillText('input (up to 50 frames)',tx(45),mt+fh-8);
+  ctx.fillStyle='#666';ctx.fillText('predict next 21 frames',tx(72),mt+fh-8);
+
+  // Legend
+  ctx.font='11px Lato,sans-serif';ctx.textAlign='left';ctx.fillStyle='#333';ctx.textBaseline='middle';
+  var ly=ty(46);
+  // Offense
+  dot(58,46,6,'#1772d0','',false);ctx.fillStyle='#333';ctx.fillText('Offense',tx(58)+10,ly);
+  // Defense
+  dot(68,46,6,'#c0392b','',false);ctx.fillStyle='#333';ctx.fillText('Defense',tx(68)+10,ly);
+  // Input (dots)
+  ctx.fillStyle='#555';
+  ctx.beginPath();ctx.arc(tx(78),ly,3,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(tx(79.5),ly,3,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(tx(81),ly,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#333';ctx.fillText('Input',tx(81)+7,ly);
+  // Actual (dashed, faded)
+  ctx.strokeStyle='#555';ctx.lineWidth=2;ctx.setLineDash([5,3]);ctx.globalAlpha=0.45;ctx.beginPath();ctx.moveTo(tx(87),ly);ctx.lineTo(tx(90),ly);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  ctx.fillStyle='#333';ctx.fillText('Actual',tx(90)+5,ly);
+  // Predicted (solid)
+  ctx.strokeStyle='#555';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(tx(97),ly);ctx.lineTo(tx(100),ly);ctx.stroke();
+  ctx.fillStyle='#333';ctx.fillText('Predicted',tx(100)+5,ly);
+})();
+</script>

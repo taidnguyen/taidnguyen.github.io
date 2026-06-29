@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XPMB0SVKEY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XPMB0SVKEY');
+  </script>
+  <title>{{ page.title }} | {{ site.name }}</title>
+
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <meta name="author" content="{{ site.name }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% if page.description %}
+  <meta name="description" content="{{ page.description }}">
+  {% endif %}
+
+  <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css" />
+  <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '\\[', right: '\\]', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'svg']
+    });"></script>
+  {% feed_meta %}
+</head>
+
+<body>
+  <table style="width:100%;max-width:760px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+    <tr style="padding:0px">
+      <td style="padding:0px">
+
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+          <tr>
+            <td style="padding:2% 0.7%;vertical-align:middle">
+              <p><a href="/">← Home</a>&nbsp;&nbsp;/&nbsp;&nbsp;<a href="/blog/">Writing</a></p>
+              <h1 style="text-align:left;font-size:26px;margin-block-end:8px;">{{ page.title }}</h1>
+              <p style="color:#555;font-size:13px;margin:0;">
+                {{ page.date | date: "%B %-d, %Y" }}
+                {% if page.read_time %}&nbsp;&middot;&nbsp;{{ page.read_time }} min read{% endif %}
+              </p>
+            </td>
+          </tr>
+        </table>
+
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+          <tr>
+            <td style="padding:0 0.7% 2%;vertical-align:top" class="blog-content">
+              {{ content }}
+            </td>
+          </tr>
+        </table>
+
+        {% if page.comments != false %}
+        <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
+          <tr>
+            <td style="padding:0 0.7% 2%;vertical-align:top">
+              <div id="disqus_thread"></div>
+              <script>
+                var disqus_config = function () {
+                  this.page.url = '{{ page.url | prepend: site.baseurl | prepend: site.url }}';
+                  this.page.identifier = '{{ page.url }}';
+                };
+                (function() {
+                  var d = document, s = d.createElement('script');
+                  s.src = 'https://{{ site.disqus }}.disqus.com/embed.js';
+                  s.setAttribute('data-timestamp', +new Date());
+                  (d.head || d.body).appendChild(s);
+                })();
+              </script>
+              <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            </td>
+          </tr>
+        </table>
+        {% endif %}
+
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

@@ -1,0 +1,228 @@
+<style>
+  .pv-wrap{margin:20px 0;}
+  .pv-nav{text-align:center;margin-bottom:6px;}
+  .pv-nav button{padding:5px 14px;font-size:15px;cursor:pointer;border:1px solid #ccc;border-radius:4px;background:#fff;}
+  .pv-nav span{margin:0 10px;font-family:'Lato',sans-serif;font-size:13px;color:#555;}
+  .pv-meta{text-align:center;font-family:'Lato',sans-serif;font-size:13px;color:#555;margin-bottom:2px;}
+  .pv-desc{text-align:center;font-family:'Source Serif 4','Lato',serif;font-size:13px;color:#888;margin-bottom:6px;font-style:italic;}
+  .pv-controls{text-align:center;margin-top:5px;}
+  .pv-controls button{padding:3px 12px;font-size:13px;cursor:pointer;border:1px solid #ccc;border-radius:4px;background:#fff;font-family:'Lato',sans-serif;}
+  .pv-controls span{margin-left:10px;font-family:'Lato',sans-serif;font-size:12px;color:#888;}
+  .pv-legend{text-align:center;margin-top:6px;font-family:'Lato',sans-serif;font-size:11px;color:#aaa;}
+</style>
+
+<script>
+(function(){
+  var DATA_URL='/assets/data/nfl-plays.json';
+
+  function PlayViewer(canvasId,playBtnId,prevId,nextId,counterId,infoId,descId,frameLabelId){
+    this.canvas=document.getElementById(canvasId);
+    this.ctx=this.canvas.getContext('2d');
+    // HiDPI: scale canvas backing store for sharp rendering on retina displays
+    var dpr=window.devicePixelRatio||1;
+    var cssW=this.canvas.width, cssH=this.canvas.height;
+    this.canvas.width=cssW*dpr;
+    this.canvas.height=cssH*dpr;
+    this.canvas.style.width=cssW+'px';
+    this.canvas.style.height=cssH+'px';
+    this.ctx.scale(dpr,dpr);
+    this.cssW=cssW;this.cssH=cssH;
+    this.plays=[];this.ci=0;this.animId=null;this.animFrame=0;
+    this.els={
+      playBtn:document.getElementById(playBtnId),
+      prev:document.getElementById(prevId),
+      next:document.getElementById(nextId),
+      counter:document.getElementById(counterId),
+      info:document.getElementById(infoId),
+      desc:document.getElementById(descId),
+      frameLabel:document.getElementById(frameLabelId),
+    };
+    var ml=40,mr=10,mt=10,mb=20;
+    this.ml=ml;this.mt=mt;
+    this.fw=cssW-ml-mr;
+    this.fh=cssH-mt-mb;
+  }
+
+  PlayViewer.prototype.tx=function(x){return this.ml+(x/120)*this.fw;};
+  PlayViewer.prototype.ty=function(y){return this.mt+(1-y/53.3)*this.fh;};
+
+  PlayViewer.prototype.drawField=function(){
+    var ctx=this.ctx,ml=this.ml,mt=this.mt,fw=this.fw,fh=this.fh;
+    ctx.clearRect(0,0,this.cssW,this.cssH);
+    ctx.fillStyle='rgba(58,125,68,0.10)';ctx.fillRect(ml,mt,fw,fh);
+    ctx.strokeStyle='rgba(58,125,68,0.25)';ctx.lineWidth=0.5;
+    for(var yd=10;yd<=110;yd+=10){
+      var lx=this.tx(yd);ctx.beginPath();ctx.moveTo(lx,mt);ctx.lineTo(lx,mt+fh);ctx.stroke();
+    }
+    ctx.fillStyle='rgba(58,125,68,0.05)';
+    ctx.fillRect(ml,mt,this.tx(10)-ml,fh);
+    ctx.fillRect(this.tx(110),mt,this.tx(120)-this.tx(110),fh);
+    ctx.fillStyle='#bbb';ctx.font='9px Lato,sans-serif';ctx.textAlign='center';
+    for(var yd=10;yd<=110;yd+=10){
+      var label=yd<=50?yd:120-yd;
+      ctx.fillText(label,this.tx(yd),mt+fh+13);
+    }
+  };
+
+  PlayViewer.prototype.drawPath=function(pts,color,width,dash){
+    if(!pts||pts.length<2)return;
+    // Filter out (0,0) padding from fixed-length trajectory arrays
+    var valid=pts.filter(function(p){return p.x!==0||p.y!==0;});
+    if(valid.length<2)return;
+    var ctx=this.ctx;ctx.strokeStyle=color;ctx.lineWidth=width||2;
+    ctx.setLineDash(dash||[]);
+    ctx.beginPath();ctx.moveTo(this.tx(valid[0].x),this.ty(valid[0].y));
+    for(var i=1;i<valid.length;i++)ctx.lineTo(this.tx(valid[i].x),this.ty(valid[i].y));
+    ctx.stroke();ctx.setLineDash([]);
+  };
+
+  PlayViewer.prototype.drawDot=function(x,y,r,color,ring,label){
+    var ctx=this.ctx,cx=this.tx(x),cy=this.ty(y);
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+    if(ring){ctx.beginPath();ctx.arc(cx,cy,r+4,0,Math.PI*2);ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();}
+    if(label){
+      ctx.fillStyle='#fff';ctx.font='bold 9px Lato,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(label,cx,cy);
+    }
+  };
+
+  // Draw a transition marker — white-filled circle with colored border
+  PlayViewer.prototype.drawTransition=function(x,y,color){
+    var ctx=this.ctx,cx=this.tx(x),cy=this.ty(y);
+    ctx.beginPath();ctx.arc(cx,cy,6,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,6,0,Math.PI*2);ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
+  };
+
+  PlayViewer.prototype.drawPlay=function(frameIdx){
+    var play=this.plays[this.ci];if(!play)return;
+    this.drawField();
+    var fr=play.frames[Math.min(frameIdx,play.frames.length-1)];
+
+    // Determine target's team color
+    var tgtColor='#1772d0'; // default offense blue
+    for(var i=0;i<fr.players.length;i++){
+      if(fr.players[i].is_target&&fr.players[i].side==='Defense'){tgtColor='#c0392b';break;}
+    }
+
+    // Ground truth future (dashed, faded — the reference)
+    this.ctx.globalAlpha=0.45;
+    this.drawPath(play.ground_truth,tgtColor,2,[6,4]);
+    var gt=(play.ground_truth||[]).filter(function(p){return p.x!==0||p.y!==0;});
+    if(gt.length){this.drawDot(gt[gt.length-1].x,gt[gt.length-1].y,4,tgtColor);}
+    this.ctx.globalAlpha=1;
+
+    // Model prediction (solid, team color)
+    this.drawPath(play.model_pred,tgtColor,2.5);
+    var mp=(play.model_pred||[]).filter(function(p){return p.x!==0||p.y!==0;});
+    if(mp.length){this.drawDot(mp[mp.length-1].x,mp[mp.length-1].y,5,tgtColor);}
+
+    // Target's observed positions so far (individual data points)
+    var observed=[];
+    for(var f=0;f<=Math.min(frameIdx,play.frames.length-1);f++){
+      var pls=play.frames[f].players;
+      for(var j=0;j<pls.length;j++){
+        if(pls[j].is_target){observed.push({x:pls[j].x,y:pls[j].y});break;}
+      }
+    }
+    var ctx=this.ctx;
+    ctx.fillStyle=tgtColor;
+    for(var i=0;i<observed.length;i++){
+      ctx.beginPath();ctx.arc(this.tx(observed[i].x),this.ty(observed[i].y),3,0,Math.PI*2);ctx.fill();
+    }
+
+    // Transition marker at last observed position
+    if(observed.length>0){
+      var last=observed[observed.length-1];
+      this.drawTransition(last.x,last.y,tgtColor);
+    }
+
+    // Players — colored by side, target gets ring
+    for(var i=0;i<fr.players.length;i++){
+      var p=fr.players[i];
+      var pos=p.pos||'';
+      var col=p.side==='Offense'?'#1772d0':'#c0392b';
+      this.drawDot(p.x,p.y,9,col,p.is_target,pos);
+    }
+
+    var label=(play._label||'')+
+      '  |  Frame '+(frameIdx+1)+'/'+play.frames.length+
+      '  |  '+play.route+' route, '+play.result+
+      (play.yards?' ('+play.yards+' yd)':'')+
+      '  |  ADE: '+play.ade+' yd';
+    this.els.frameLabel.textContent=label;
+  };
+
+  PlayViewer.prototype.render=function(){
+    var play=this.plays[this.ci];
+    this.els.counter.textContent=(this.ci+1)+' / '+this.plays.length;
+    this.els.info.textContent=play.label;
+    this.els.desc.textContent=play.desc;
+    this.animFrame=0;this.stop();this.drawPlay(0);
+  };
+
+  PlayViewer.prototype.stop=function(){
+    if(this.animId){clearInterval(this.animId);this.animId=null;}
+    this.els.playBtn.innerHTML='&#9654; Play';
+  };
+
+  PlayViewer.prototype.nav=function(d){
+    this.stop();this.ci=(this.ci+d+this.plays.length)%this.plays.length;this.render();
+  };
+
+  PlayViewer.prototype.toggleAnim=function(){
+    if(this.animId){this.stop();return;}
+    var self=this;this.animFrame=0;
+    this.els.playBtn.innerHTML='&#9724; Stop';
+    this.animId=setInterval(function(){
+      self.drawPlay(self.animFrame);self.animFrame++;
+      if(self.animFrame>=self.plays[self.ci].frames.length){
+        self.drawPlay(self.plays[self.ci].frames.length-1);self.stop();
+      }
+    },200);
+  };
+
+  PlayViewer.prototype.init=function(plays){
+    // Compute per-side index labels: "Offense #1", "Defense #3", etc.
+    var offN=0,defN=0;
+    for(var i=0;i<plays.length;i++){
+      if(plays[i].side==='Defense'){defN++;plays[i]._label='Defense #'+defN;}
+      else{offN++;plays[i]._label='Offense #'+offN;}
+    }
+    this.plays=plays;this.ci=0;this.render();
+  };
+
+  // Create viewers (only if their canvas exists on the page)
+  var vBest=document.getElementById('pv-best-canvas')?new PlayViewer('pv-best-canvas','pv-best-play','pv-best-prev','pv-best-next','pv-best-ctr','pv-best-info','pv-best-desc','pv-best-fl'):null;
+  var vWorst=new PlayViewer('pv-worst-canvas','pv-worst-play','pv-worst-prev','pv-worst-next','pv-worst-ctr','pv-worst-info','pv-worst-desc','pv-worst-fl');
+  var vPresnap=new PlayViewer('pv-presnap-canvas','pv-presnap-play','pv-presnap-prev','pv-presnap-next','pv-presnap-ctr','pv-presnap-info','pv-presnap-desc','pv-presnap-fl');
+
+  // Wire buttons
+  if(vBest){
+    document.getElementById('pv-best-prev').onclick=function(){vBest.nav(-1);};
+    document.getElementById('pv-best-next').onclick=function(){vBest.nav(1);};
+    document.getElementById('pv-best-play').onclick=function(){vBest.toggleAnim();};
+  }
+  document.getElementById('pv-worst-prev').onclick=function(){vWorst.nav(-1);};
+  document.getElementById('pv-worst-next').onclick=function(){vWorst.nav(1);};
+  document.getElementById('pv-worst-play').onclick=function(){vWorst.toggleAnim();};
+  document.getElementById('pv-presnap-prev').onclick=function(){vPresnap.nav(-1);};
+  document.getElementById('pv-presnap-next').onclick=function(){vPresnap.nav(1);};
+  document.getElementById('pv-presnap-play').onclick=function(){vPresnap.toggleAnim();};
+
+  // Load data
+  fetch(DATA_URL)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(vBest&&d.best) vBest.init(d.best);
+      vWorst.init(d.worst);
+      if(d.presnap) vPresnap.init(d.presnap);
+    })
+    .catch(function(){
+      var c=document.getElementById('pv-worst-canvas');
+      if(!c)return;
+      var cx=c.getContext('2d');
+      cx.fillStyle='#999';cx.font='14px Lato,sans-serif';cx.textAlign='center';
+      cx.fillText('Could not load play data.',350,165);
+    });
+})();
+</script>

@@ -112,3 +112,197 @@ span.highlight {
   font-weight: bold;
   font-size: 0.9em;
 }
+
+/* Blog content styles */
+.blog-content {
+  font-family: 'Source Serif 4', 'Lato', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #1a1a1a;
+
+  h2 {
+    font-family: 'Lato', Verdana, Helvetica, sans-serif;
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 40px 0 12px 0;
+    padding-bottom: 6px;
+  }
+
+  h3 {
+    font-family: 'Lato', Verdana, Helvetica, sans-serif;
+    display: block;
+    font-size: 17px;
+    font-weight: 700;
+    margin: 28px 0 8px 0;
+  }
+
+  h4 {
+    font-family: 'Lato', Verdana, Helvetica, sans-serif;
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 20px 0 6px 0;
+  }
+
+  p {
+    margin: 0 0 16px 0;
+  }
+
+  ul, ol {
+    margin: 0 0 16px 0;
+    padding-left: 28px;
+  }
+
+  li {
+    margin-bottom: 6px;
+    font-family: 'Lato', Verdana, Helvetica, sans-serif;
+    font-size: 14px;
+  }
+
+  code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 13.5px;
+    background-color: #f6f8fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #e8e8e8;
+  }
+
+  pre {
+    background-color: #f6f8fa;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 0 0 20px 0;
+    border: 1px solid #e8e8e8;
+
+    code {
+      background: none;
+      padding: 0;
+      border: none;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+  }
+
+  blockquote {
+    border-left: 3px solid #1772d0;
+    margin: 0 0 16px 0;
+    padding: 8px 0 8px 20px;
+    color: #555;
+    font-style: italic;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  // Figures with captions
+  figure {
+    margin: 24px 0;
+    text-align: center;
+
+    img, svg {
+      max-width: 100%;
+    }
+
+    figcaption {
+      font-family: 'Lato', sans-serif;
+      font-size: 13px;
+      color: #666;
+      margin-top: 8px;
+      font-style: italic;
+    }
+  }
+
+  // Results tables
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-family: 'Lato', sans-serif;
+    font-size: 13.5px;
+
+    th {
+      background: #f6f8fa;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 2px solid #d0d0d0;
+      font-size: 13px;
+    }
+
+    td {
+      padding: 6px 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 13.5px;
+    }
+
+    tr:hover td {
+      background: #f9f9f9;
+    }
+
+    // Highlight best row
+    tr.best td {
+      background: #f0fff4;
+      font-weight: 600;
+    }
+  }
+
+  // SVG diagram container
+  .diagram {
+    margin: 28px 0;
+    text-align: center;
+    overflow-x: auto;
+
+    svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .diagram-caption {
+      font-family: 'Lato', sans-serif;
+      font-size: 13px;
+      color: #666;
+      margin-top: 8px;
+      font-style: italic;
+    }
+  }
+
+  // Section lead-in (larger first paragraph)
+  .lead {
+    font-size: 17px;
+    color: #444;
+    line-height: 1.6;
+  }
+
+  // References
+  .refs {
+    font-family: 'Lato', Verdana, Helvetica, sans-serif;
+    font-size: 14px;
+  }
+
+  // Footnotes
+  .footnote {
+    font-size: 13px;
+    color: #666;
+    border-top: 1px solid #eee;
+    margin-top: 32px;
+    padding-top: 12px;
+  }
+
+  // Math display blocks
+  .katex-display {
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  // Horizontal rule
+  hr {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 32px 0;
+  }
+}

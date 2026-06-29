@@ -1,0 +1,186 @@
+<div id="offense-quadrant" style="width:100%;max-width:760px;margin:24px auto;"></div>
+<figcaption style="text-align:center;font-family:'Lato',sans-serif;font-size:13px;color:#666;font-style:italic;margin-top:-12px;margin-bottom:24px;">
+  Route deviation = mean receiver ADE at K=10. EPA = expected points added per play. Full 2023 regular season (weeks 1–18, 46k plays).
+</figcaption>
+<div id="defense-quadrant" style="width:100%;max-width:760px;margin:24px auto;"></div>
+<figcaption style="text-align:center;font-family:'Lato',sans-serif;font-size:13px;color:#666;font-style:italic;margin-top:-12px;margin-bottom:8px;">
+  Opponent route deviation = mean opponent receiver ADE at K=10. Y-axis negated so up = better defense.
+</figcaption>
+<script>
+(function() {
+  // ESPN CDN logo URL mapping
+  var espnAbbr = {
+    ARI:'ari',ATL:'atl',BAL:'bal',BUF:'buf',CAR:'car',CHI:'chi',CIN:'cin',CLE:'cle',
+    DAL:'dal',DEN:'den',DET:'det',GB:'gb',HOU:'hou',IND:'ind',JAX:'jax',KC:'kc',
+    LA:'lar',LAC:'lac',LV:'lv',MIA:'mia',MIN:'min',NE:'ne',NO:'no',NYG:'nyg',
+    NYJ:'nyj',PHI:'phi',PIT:'pit',SEA:'sea',SF:'sf',TB:'tb',TEN:'ten',WAS:'wsh'
+  };
+  function logoUrl(team) {
+    return 'https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/'+(espnAbbr[team]||team.toLowerCase())+'.png';
+  }
+
+  // 2023 regular season records and rankings
+  var records = {
+    ARI:{w:4,l:13,pf:330,pa:455},ATL:{w:7,l:10,pf:321,pa:359},BAL:{w:13,l:4,pf:483,pa:280},
+    BUF:{w:11,l:6,pf:451,pa:311},CAR:{w:2,l:15,pf:236,pa:416},CHI:{w:7,l:10,pf:286,pa:359},
+    CIN:{w:9,l:8,pf:366,pa:384},CLE:{w:11,l:6,pf:396,pa:362},DAL:{w:12,l:5,pf:509,pa:315},
+    DEN:{w:8,l:9,pf:357,pa:359},DET:{w:12,l:5,pf:461,pa:345},GB:{w:9,l:8,pf:383,pa:365},
+    HOU:{w:10,l:7,pf:378,pa:348},IND:{w:9,l:8,pf:396,pa:427},JAX:{w:9,l:8,pf:338,pa:358},
+    KC:{w:11,l:6,pf:371,pa:291},LA:{w:10,l:7,pf:376,pa:374},LAC:{w:5,l:12,pf:346,pa:384},
+    LV:{w:8,l:9,pf:326,pa:388},MIA:{w:11,l:6,pf:496,pa:391},MIN:{w:7,l:10,pf:344,pa:387},
+    NE:{w:4,l:13,pf:236,pa:366},NO:{w:9,l:8,pf:379,pa:364},NYG:{w:6,l:11,pf:264,pa:370},
+    NYJ:{w:7,l:10,pf:268,pa:355},PHI:{w:11,l:6,pf:433,pa:307},PIT:{w:10,l:7,pf:304,pa:324},
+    SEA:{w:9,l:8,pf:364,pa:389},SF:{w:12,l:5,pf:491,pa:298},TB:{w:9,l:8,pf:363,pa:349},
+    TEN:{w:6,l:11,pf:245,pa:367},WAS:{w:4,l:13,pf:295,pa:480}
+  };
+
+  // Compute offensive rank (by PF, 1=most) and defensive rank (by PA, 1=fewest)
+  var teams = Object.keys(records);
+  var byPF = teams.slice().sort(function(a,b){return records[b].pf-records[a].pf;});
+  var byPA = teams.slice().sort(function(a,b){return records[a].pa-records[b].pa;});
+  teams.forEach(function(t){
+    records[t].offRank = byPF.indexOf(t)+1;
+    records[t].defRank = byPA.indexOf(t)+1;
+  });
+
+  var off = [
+    {team:"DET",x:37.78,y:0.320},{team:"BUF",x:37.24,y:0.260},{team:"ARI",x:37.21,y:0.052},
+    {team:"WAS",x:37.11,y:0.102},{team:"KC",x:36.92,y:0.143},{team:"NYG",x:36.66,y:0.106},
+    {team:"LV",x:36.58,y:0.160},{team:"NYJ",x:36.50,y:-0.072},{team:"IND",x:36.49,y:0.211},
+    {team:"CIN",x:36.47,y:0.205},{team:"CHI",x:35.73,y:0.252},{team:"DEN",x:35.62,y:0.269},
+    {team:"LAC",x:35.44,y:0.283},{team:"TB",x:35.32,y:0.280},{team:"DAL",x:35.31,y:0.383},
+    {team:"HOU",x:35.19,y:0.333},{team:"ATL",x:35.10,y:0.090},{team:"NO",x:35.00,y:0.221},
+    {team:"CAR",x:34.44,y:0.094},{team:"JAX",x:34.26,y:0.169},{team:"CLE",x:34.06,y:0.035},
+    {team:"PIT",x:34.04,y:0.160},{team:"LA",x:33.97,y:0.273},{team:"SEA",x:33.93,y:0.279},
+    {team:"NE",x:33.64,y:-0.139},{team:"SF",x:33.57,y:0.529},{team:"PHI",x:33.54,y:0.310},
+    {team:"TEN",x:33.47,y:0.215},{team:"MIN",x:33.42,y:0.269},{team:"MIA",x:33.30,y:0.365},
+    {team:"BAL",x:32.92,y:0.457},{team:"GB",x:32.16,y:0.288}
+  ];
+
+  // Defense: y negated so higher = better defense (less EPA allowed)
+  var def = [
+    {team:"GB",x:37.00,y:-0.313},{team:"CHI",x:36.69,y:-0.095},{team:"SEA",x:36.54,y:-0.278},
+    {team:"LV",x:36.51,y:-0.225},{team:"PHI",x:36.30,y:-0.242},{team:"JAX",x:36.11,y:-0.111},
+    {team:"SF",x:36.11,y:-0.073},{team:"KC",x:35.83,y:-0.173},{team:"ATL",x:35.64,y:-0.226},
+    {team:"NYJ",x:35.44,y:-0.100},{team:"ARI",x:35.34,y:-0.407},{team:"CLE",x:35.29,y:-0.050},
+    {team:"PIT",x:35.26,y:-0.220},{team:"MIN",x:35.11,y:-0.280},{team:"BUF",x:35.09,y:-0.112},
+    {team:"MIA",x:35.00,y:-0.286},{team:"DET",x:34.94,y:-0.302},{team:"HOU",x:34.93,y:-0.293},
+    {team:"CAR",x:34.92,y:-0.230},{team:"IND",x:34.87,y:-0.199},{team:"TEN",x:34.84,y:-0.350},
+    {team:"LAC",x:34.73,y:-0.306},{team:"WAS",x:34.58,y:-0.433},{team:"NE",x:34.33,y:-0.189},
+    {team:"DAL",x:34.24,y:-0.048},{team:"DEN",x:34.19,y:-0.338},{team:"BAL",x:34.18,y:-0.059},
+    {team:"LA",x:34.17,y:-0.194},{team:"CIN",x:34.05,y:-0.319},{team:"NYG",x:33.99,y:-0.096},
+    {team:"TB",x:33.74,y:-0.264},{team:"NO",x:33.55,y:-0.056}
+  ];
+
+  function median(arr) {
+    var s = arr.slice().sort(function(a,b){return a-b;});
+    var m = Math.floor(s.length/2);
+    return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
+  }
+
+  function quadrantPlot(divId, data, opts) {
+    var xs = data.map(function(d){return d.x;});
+    var ys = data.map(function(d){return d.y;});
+    var xMed = median(xs);
+    var yMed = median(ys);
+
+    var xRange = Math.max.apply(null,xs)-Math.min.apply(null,xs);
+    var yRange = Math.max.apply(null,ys)-Math.min.apply(null,ys);
+    var xPad = xRange*0.12;
+    var yPad = yRange*0.18;
+    var xMin = Math.min.apply(null,xs)-xPad, xMax = Math.max.apply(null,xs)+xPad;
+    var yMin = Math.min.apply(null,ys)-yPad, yMax = Math.max.apply(null,ys)+yPad;
+
+    // Logo sizing in data coordinates
+    var logoSizeX = xRange * 0.055;
+    var logoSizeY = yRange * 0.095;
+
+    // Invisible scatter for hover
+    var hoverTexts = data.map(function(d) {
+      var r = records[d.team];
+      return '<b>'+d.team+'</b> ('+r.w+'–'+r.l+')' +
+        '<br>'+opts.xHover+': '+d.x.toFixed(1)+' yd' +
+        '<br>'+opts.yHover+': '+(opts.yNegated ? (-d.y).toFixed(3) : d.y.toFixed(3))+' EPA' +
+        '<br>'+opts.rankLabel+': #'+r[opts.rankKey];
+    });
+
+    var trace = {
+      x: xs, y: ys, mode: 'markers',
+      marker: {size: 1, opacity: 0},
+      hoverinfo: 'text', hovertext: hoverTexts,
+      type: 'scatter'
+    };
+
+    // Place logos via layout.images
+    var images = data.map(function(d) {
+      return {
+        source: logoUrl(d.team),
+        x: d.x, y: d.y,
+        xref: 'x', yref: 'y',
+        sizex: logoSizeX, sizey: logoSizeY,
+        xanchor: 'center', yanchor: 'middle',
+        layer: 'above'
+      };
+    });
+
+    // Quadrant labels — bold, clearly visible in each quadrant
+    var qPos = [
+      [(xMax+xMed)/2, (yMax+yMed)/2],
+      [(xMin+xMed)/2, (yMax+yMed)/2],
+      [(xMax+xMed)/2, (yMin+yMed)/2],
+      [(xMin+xMed)/2, (yMin+yMed)/2],
+    ];
+    var annotations = [];
+    for (var i=0; i<4; i++) {
+      annotations.push({
+        x: qPos[i][0], y: qPos[i][1], xref:'x', yref:'y',
+        text: '<b>'+opts.quadLabels[i]+'</b>', showarrow: false,
+        font: {size: 14, color: 'rgba(60,60,60,0.45)', family: 'Lato, sans-serif'}
+      });
+    }
+
+    var layout = {
+      title: {text: opts.title, font: {family: 'Lato, sans-serif', size: 15}},
+      xaxis: {title: opts.xTitle, gridcolor: '#eee', zeroline: false,
+              range: [xMin, xMax], titlefont: {size: 11, color: '#666'}},
+      yaxis: {title: opts.yTitle, gridcolor: '#eee', zeroline: false,
+              range: [yMin, yMax], titlefont: {size: 11, color: '#666'}},
+      shapes: [
+        {type:'line',x0:xMed,x1:xMed,y0:yMin,y1:yMax,
+         line:{color:'rgba(0,0,0,0.3)',width:1.5,dash:'dash'}},
+        {type:'line',x0:xMin,x1:xMax,y0:yMed,y1:yMed,
+         line:{color:'rgba(0,0,0,0.3)',width:1.5,dash:'dash'}}
+      ],
+      images: images,
+      annotations: annotations,
+      margin: {l:80,r:30,t:50,b:65},
+      plot_bgcolor: 'white', paper_bgcolor: 'white',
+      font: {family: 'Lato, sans-serif'},
+      showlegend: false,
+      hovermode: 'closest'
+    };
+
+    Plotly.newPlot(divId, [trace], layout, {responsive:true, displayModeBar:false});
+  }
+
+  quadrantPlot('offense-quadrant', off, {
+    title: 'Offensive Route Deviation vs EPA',
+    xTitle: 'Route Deviation (ADE, yards) →',
+    yTitle: 'EPA per Play →',
+    xHover: 'Route deviation', yHover: 'EPA/play', yNegated: false,
+    rankLabel: 'Offense rank (pts scored)', rankKey: 'offRank',
+    quadLabels: ['High Deviation, High EPA', 'Low Deviation, High EPA',
+                 'High Deviation, Low EPA', 'Low Deviation, Low EPA']
+  });
+
+  quadrantPlot('defense-quadrant', def, {
+    title: 'Opponent Route Deviation vs EPA Allowed',
+    xTitle: 'Opponent Route Deviation (ADE, yards) →',
+    yTitle: '−EPA per Play Allowed →',
+    xHover: 'Opp. route deviation', yHover: 'EPA allowed/play', yNegated: true,
+    rankLabel: 'Defense rank (pts allowed)', rankKey: 'defRank',
+    quadLabels: ['High Opp. Deviation, Stingy', 'Low Opp. Deviation, Stingy',
+                 'High Opp. Deviation, Leaky', 'Low Opp. Deviation, Leaky']
+  });
+})();
+</script>
