@@ -147,10 +147,10 @@ A handful of evals, step 0 of the run against its last step, locates the gain.
 | Eval task | step 0 | step n |
 |---|---|---|
 | Arithmetic free form (in distribution) | 0.40 | 0.70 |
-| Arithmetic ranked classification (in distribution) | 0.53 | 0.72 |
-| Morse decode (near transfer) | — | — |
-| HumanEval pass@1 (far transfer) | — | — |
-| HumanEval pass@5 (far transfer) | 0.11 | 0.11 |
+| Arithmetic ranked classification (in distribution) | 0.70 | 0.80 |
+| Morse decode (near transfer) | 0.15 | 0.25 |
+| HumanEval pass@1 (far transfer) | 0.04 | 0.04 |
+| HumanEval pass@5 (far transfer) | 0.10 | 0.10 |
 
 The two in-distribution rows move while near and far transfer stay flat, which is what a narrow loop on a weak model should do. It sharpens the trained skill without spilling into general reasoning.
 
@@ -171,7 +171,7 @@ Since our chosen datasets might come with groundtruth (eg. Math textbooks) and s
 
 When the Challenger wrote its own key, the key was right only 11% of the time, and 73% of the tasks it called agreed were wrong. The errors were not random. They sat on the two things the model fails at, distributing over parentheses and signs on negative results. The Challenger states a wrong answer, the Reasoner shares the same blind spot and agrees, $p$ goes to one, and the wrong value trains as the gold. A model cannot correct a mistake that both of its halves make.
 
-<div style="font-family:'SFMono-Regular',Consolas,monospace;font-size:12.5px;line-height:1.55;background:#fafafa;border:1px solid #ececec;border-radius:4px;padding:12px 14px;margin:18px 0;color:#333;white-space:pre-wrap;">Challenger   What is 6 × (4 + 2)?       its key 24       true value 36
+<div style="font-family:'SFMono-Regular',Consolas,monospace;font-size:12.5px;line-height:1.55;background:#fafafa;border:1px solid #ececec;border-radius:4px;padding:12px 14px;margin:18px 0;color:#333;white-space:pre-wrap;">Challenger   What is 6 × (4 + 2)?
 Reasoner     24  24  24  24  24  24  24  18     (eight tries)</div>
 <p style="font-size:11.5px;color:#999;margin:-8px 0 18px;">Both halves drop the parentheses to 6 × 4 and agree on 24, so the wrong value trains as the gold. The true answer 36 never appears.</p>
 
@@ -256,7 +256,7 @@ And then the loop went quiet. The fraction of questions landing at the frontier 
 
 <div style="font-family:'SFMono-Regular',Consolas,monospace;font-size:12.5px;line-height:1.55;background:#fafafa;border:1px solid #ececec;border-radius:4px;padding:12px 14px;margin:18px 0;color:#333;white-space:pre-wrap;">early   Challenger  What is 6 × (4 + 2)?    gold 24   true 36
 late    Challenger  What is 6 × 5?          gold 30   true 30</div>
-<p style="font-size:11.5px;color:#999;margin:-8px 0 18px;">The gate killed the runaway, then the curriculum retreated to questions everyone could ace. Self-guidance buys safety, not capability.</p>
+<p style="font-size:11.5px;color:#999;margin:-8px 0 18px;">The gate killed the runaway, then the curriculum retreated to questions everyone could ace. So the model plays it safe but did not push on better reasoning.</p>
 
 <div style="display:flex;flex-wrap:wrap;gap:18px;margin:24px 0;align-items:flex-start;">
   <figure style="flex:1 1 260px;margin:0;text-align:center;">
