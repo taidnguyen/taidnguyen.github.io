@@ -112,7 +112,7 @@ Q. <span class="ex-cur">▍</span> </div></div>
   </div>
 </div>
 
-To help the model, we prompt the model with few-shot samples (varied per train corpus). The task is intentionall simplfied to Yes/No/TBD. This is not terribly interesting, is hopefully within model capability. Here, the multiple-choice question format is followed, and the CoT is solid. However, there are two nuances that could be better: 1. Not terribly interesting, and 2. The question itself is not self-contained, meaning the Reasoner cannot solve it reasonably without the passage. 
+To help the model, we prompt the model with few-shot samples (varied per train corpus). The task is intentionall simplfied to Yes/No/TBD. This is not terribly interesting, is hopefully within model capability. Here, the multiple-choice question format is followed, and the CoT is solid. However, there are two nuances that could be better: 1. Not terribly interesting, and 2. The question itself is not self-contained, meaning the Reasoner cannot solve it reasonably without the passage.
 
 <!-- <div class="ex">
   <div class="ex-h">Example #2 &middot; arithmetic, early vs late</div>
@@ -140,21 +140,19 @@ Q. <span class="ex-cur">▍</span>  <span style="color:#aaa;">talkie continues h
 
 ## Results
 
-Before the ablations dig in, the short version. On this data-constrained vintage model, corpus-grounded self-play does buy a real capability lift, and close to for free. Held-out arithmetic climbs over training and holds in the 0.6 to 0.7 range, up from around 0.4 to 0.5 at the start.
+Corpus-grounded self-play provided an easy and real capability lift. For instance, held-out arithmetic climbs over training and holds in the 0.6 to 0.7 range, up from around 0.4 to 0.5 at the start.
 
-A handful of evals, step 0 of the run against its last step, locates the gain.
+| Task | step 0 | step 49 | step 99 | step 124 |
+|---|---|---|---|---|
+| Arithmetic free form (in distribution) | 0.40 | 0.60 | 0.70 | 0.70 |
+| Arithmetic ranked classification (in distribution) | 0.70 | 0.70 | 0.70 | 0.80 |
+| Morse decode (near transfer) | 0.15 | 0.15 | 0.05 | 0.25 |
+| HumanEval pass@1 (far transfer) | 0.04 | 0.04 | 0.04 | 0.05 |
+| HumanEval pass@5 (far transfer) | 0.10 | 0.09 | 0.10 | 0.10 |
 
-| Eval task | step 0 | step n |
-|---|---|---|
-| Arithmetic free form (in distribution) | 0.40 | 0.70 |
-| Arithmetic ranked classification (in distribution) | 0.70 | 0.80 |
-| Morse decode (near transfer) | 0.15 | 0.25 |
-| HumanEval pass@1 (far transfer) | 0.04 | 0.04 |
-| HumanEval pass@5 (far transfer) | 0.10 | 0.10 |
+Free-form arithmetic jumps early and holds there, while the ranked score only firms up at the end. As a moonshot, HumanEval stays flat, and I was not able to find a few-shot setting that reproduces the results from talkie [release](https://talkie-lm.com/introducing-talkie).
 
-The two in-distribution rows move while near and far transfer stay flat, which is what a narrow loop on a weak model should do. It sharpens the trained skill without spilling into general reasoning.
-
-You can watch the loop that earns it. The two roles stay in tension the whole way, the Challenger reward holding its mid band while the Reasoner reward and frontier rate sit near a half rather than running to zero or one.
+Challenger and Reasoner stay in tension the whole way, the Challenger reward holding its mid band while the Reasoner reward and frontier rate sit near a half rather than running to zero or one.
 
 <figure style="margin:26px 0;text-align:center;">
   <img src="/assets/images/training_dynamics.png" alt="Challenger reward, Reasoner reward and frontier rate over training" style="width:100%;">
@@ -162,8 +160,6 @@ You can watch the loop that earns it. The two roles stay in tension the whole wa
 </figure>
 
 Two conditions decide whether that happens. The reward has to be verifiable. With computed gold the eval climbs, but when the model grades its own answers it collapses to about 0.3. And the lift stays in-band. Arithmetic improves while HumanEval and MMLU never move, so this is a gain on the trained skill, not on general reasoning.
-
-The ablations below pin down each piece: where the gain comes from, what does not matter, and where the loop breaks.
 
 ### Ablation: Is groundtruth required for SPICE?
 
@@ -175,9 +171,7 @@ When the Challenger wrote its own key, the key was right only 11% of the time, a
 Reasoner     24  24  24  24  24  24  24  18     (eight tries)</div>
 <p style="font-size:11.5px;color:#999;margin:-8px 0 18px;">Both halves drop the parentheses to 6 × 4 and agree on 24, so the wrong value trains as the gold. The true answer 36 never appears.</p>
 
-With computed gold none of this happens, because the key is never invented.
-
-The eval is the symptom, and the training signal shows the cause. Held-out arithmetic holds around 0.60 under computed gold and slides to 0.30 under self grading (left). Meanwhile the self-written key is right only about a tenth of the time, and the share of tasks where both halves agree on a wrong answer climbs past 0.7 (right). At the model's current level, the oracle is not a luxury.
+With computed gold none of this happens, I never observed this phenomenon.Held-out arithmetic holds around 0.60 under computed gold and slides to 0.30 under self grading (left). Meanwhile the self-written key is right only about a tenth of the time, and the share of tasks where both halves agree on a wrong answer climbs past 0.7 (right). At the model's current level, the oracle is more effective at preventing deterioration with training.
 
 <div style="display:flex;flex-wrap:wrap;gap:18px;margin:24px 0;align-items:flex-start;">
   <figure style="flex:1 1 260px;margin:0;text-align:center;">
@@ -224,13 +218,13 @@ When we relaxed the match to accept free text, hoping to admit softer questions,
 A.  ...5 nationalities, all boys, sit together... They are Wales, England, Scotland...</div>
 <p style="font-size:11.5px;color:#999;margin:-8px 0 18px;">From the free text run. The answer just restates the question, so the matcher always passes.</p>
 
-This eventually collapsed the model and dropped HumanEval to 0.036. Any low entropy answer spacealso invites the same trick. Yes or no, and a bare "(A)," both got gamed, since a guess lands often enough to look like skill. We verify the gold against the source and shuffle the option positions.
+This eventually collapsed the model and dropped HumanEval to 0.036. Any low entropy answer space also invites the same trick. Yes or no, and a bare "(A)," both got gamed, since a guess lands often enough to look like skill. One remedy was to verify the gold against the source and shuffle the option positions.
 
 Interestingly, SPICE contains a built-in reward hack prevention where, under the variance reward, copying the answer drives $p$ to one, and one sits at the bottom of the reward rather than the top.
 
 ## Scaling self-play with self-guidance
 
-The last question is the tempting one. Drop the oracle, let the model generate and grade and answer across many corpora, and hope breadth carries it. We pooled two more period books with the arithmetic pair, Lewis Carroll's *Symbolic Logic* and Faraday's *Chemical History of a Candle*.
+What if the model can serve as its own correctness judge? At no cost to memory, we can call another forward pass for reward assignment of the Reasoner. We pooled two more period books with the arithmetic pair, Lewis Carroll's *Symbolic Logic* and Faraday's *Chemical History of a Candle*.
 
 The questions it wrote were often a delight. Reading those passages, talkie composed its own Carroll-style syllogisms (Example #1) and even candle chemistry, answered in the same register.
 
@@ -240,7 +234,7 @@ Reasoner     The answer is Water.</div>
 
 The trouble was never the questions. It was the grading. A single arithmetic corpus under self grading already colludes about 73% of the time. Pool the four and that climbs to 0.99, the model agreeing with itself on nearly every wrong answer. Capability went with it and HumanEval fell from 0.107 to 0.036. More surface to hide in is not more signal.
 
-You can watch the loop give up over training. Early on the Challenger reaches for two step problems and misses. Later it has retreated to single steps it can ace, which pays nothing and teaches nothing.
+We can spot the loop give up over training. Early on the Challenger reaches for two step problems and misses. Later it has retreated to single steps it can ace, which pays nothing and teaches nothing.
 
 <div style="font-family:'SFMono-Regular',Consolas,monospace;font-size:12.5px;line-height:1.55;background:#fafafa;border:1px solid #ececec;border-radius:4px;padding:12px 14px;margin:18px 0;color:#333;white-space:pre-wrap;">step 25    Challenger  What is 12 − (8 + 4)?    key 8   true 0    Reasoner  4
 step 375   Challenger  What is 4 × 2?           key 8   true 8    Reasoner  8</div>
@@ -252,7 +246,7 @@ If the problem is a corrupt answer key, fix the key, not the student. The cheap 
 
 It worked on the failure it was built for. Across 394 steps the agreement-on-wrong-answers rate sat near 0.05 to 0.14 and fell as training went on rather than climbing to 0.99. Self-written gold went from about two thirds correct to nineteen in twenty.
 
-And then the loop went quiet. The fraction of questions landing at the frontier all but emptied, and the collusion rate fell not because the blind spot healed but because the questions got trivial. Late in training the Challenger is asking what is six times five, and the base, the policy and the gold all agree it is thirty.
+And then the loop went quiet on us. The fraction of questions landing at the frontier all but emptied, and the collusion rate fell not because the blind spot healed but because the questions got trivial. Late in training the Challenger is asking what is six times five, and the base, the policy and the gold all agree it is thirty.
 
 <div style="font-family:'SFMono-Regular',Consolas,monospace;font-size:12.5px;line-height:1.55;background:#fafafa;border:1px solid #ececec;border-radius:4px;padding:12px 14px;margin:18px 0;color:#333;white-space:pre-wrap;">early   Challenger  What is 6 × (4 + 2)?    gold 24   true 36
 late    Challenger  What is 6 × 5?          gold 30   true 30</div>
@@ -269,7 +263,7 @@ late    Challenger  What is 6 × 5?          gold 30   true 30</div>
   </figure>
 </div>
 
-So the gate does what it promises and no more. It removes the runaway, but it cannot push difficulty upward, and a weak model with nothing pulling the frontier higher drifts to the easy questions it already knows. That is the same ceiling as everywhere else in this post. Capability came only from a key the model could not write for itself.
+So the gate removes the runaway, but it cannot push difficulty upward, and a weak model with nothing pulling the frontier higher drifts to the easy questions it already knows. That is the same ceiling as everywhere else in this post. Capability came only from a key the model could not write for itself.
 
 <!-- ## What hid the signal
 
@@ -295,6 +289,6 @@ The real signal was there from the first day at about twenty percent. The work w
 - SPICE: Self-Play In Corpus Environments. [arXiv:2510.24684](https://arxiv.org/abs/2510.24684)
 - Absolute Zero: Reinforced Self-play Reasoning with Zero Data. [arXiv:2505.03335](https://arxiv.org/abs/2505.03335)
 - Understanding R1-Zero-Like Training (Dr. GRPO). [arXiv:2503.20783](https://arxiv.org/abs/2503.20783)
-- Stanford paper. [arXiv:2604.20209](https://arxiv.org/abs/2604.20209) <!-- title to confirm -->
+- Scaling Self-Play with Self-Guidance. [arXiv:2604.20209](https://arxiv.org/abs/2604.20209)
 - talkie. [talkie-lm.com](https://talkie-lm.com/introducing-talkie)
 - Are vintage LLMs the start of a new kind of history? [Res Obscura](https://resobscura.substack.com/p/are-vintage-llms-the-start-of-a-new)
