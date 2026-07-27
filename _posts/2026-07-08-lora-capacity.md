@@ -506,67 +506,64 @@ We evaluate on the following tasks:
 - **PopQA**: real Wikidata facts phrased as questions, split by entity popularity. Very close to our synthetic set and is fully grounded.
 - **Super-NaturalInstructions**: a pool of genuinely different instruction task types (translation, arithmetic, NER, summarization, sentiment, and more).
 
-**Setup.** Every adapter uses LoRA on all linear layers (attention and MLP), trained with each task's own objective. We read out two things: the reduction in test loss (held-out negative loglikelihood) over the frozen base at each rank, and the **effective rank** of $\Delta W = BA$: $\exp\big(-\sum_i p_i \log p_i\big)$ over its normalized singular values $p_i = s_i/\sum_j s_j$, the number of directions carrying real weight (median over the 65 adapted matrices). A low effective rank means one shared transformation; a high one means many independent directions.
+**Setup.** Every adapter uses LoRA on all linear layers (attention and MLP), trained with each task's own objective. In metrics, we consider:
+1. Test loss, the held-out negative log-likelihood in bits/token, over the frozen base at each rank
+2. **Effective rank** of the update $\Delta W$, which counts how many singular directions carry "real" weight. We compute it as $\exp\big(-\sum_i p_i \log p_i\big)$, the perplexity of the normalized singular values $p_i = s_i/\sum_j s_j$, and take the median over the 65 adapted matrices. A low effective rank means one shared transformation; a high one means many independent directions.
 
-### Aya: injecting a new language
+### Aya: Injecting multilinguality
 
-The first task is multilingual instruction tuning on the Aya Collection. This is an information-heavy task, since DataDecide is primarily English.
+The first task is multilingual instruction tuning on the Aya Collection, thanks to the great effort from Cohere Labs community. Given DataDecide pretraining is primarily English we deem this to be an information-heavy task where model might memorize language the way it memorizes random facts.
 
-*Hypothesis (from the capacity law, before running).* Treat the task as memorization. A new language costs the base roughly 4 bits per token, so each rank's capacity converts to a token budget — and we train far past all of them:
+*Hypothesis.* The capacity law helps us understand the budget before any training. Plugging the 1B base and each adapter into $C \propto N^{0.38}\,p^{1.08}$ outputs about 190 kbit at rank 1 and 3.7 Mbit at rank 16. We use test loss on the language as the cost of storing the per-language token, which lands in the range of 2 to 6 bits per token (third column of the table below). We can call this 4, which gives us a quick napkin math for predicted capacity:
 
-<table style="margin:16px auto;border-collapse:collapse;font-size:13.5px;color:#333;">
-<tr style="border-bottom:1px solid #ccc;color:#666;text-align:left;"><th style="padding:4px 18px;">1B adapter</th><th style="padding:4px 18px;">capacity law: can store</th><th style="padding:4px 18px;">we train on</th><th style="padding:4px 18px;">prediction</th></tr>
-<tr><td style="padding:3px 18px;">rank 1</td><td style="padding:3px 18px;text-align:center;">~40k tokens</td><td style="padding:3px 18px;text-align:center;">~8M (≈200×)</td><td style="padding:3px 18px;color:#c0392b;">should collapse</td></tr>
-<tr><td style="padding:3px 18px;">rank 16</td><td style="padding:3px 18px;text-align:center;">~1.3M tokens</td><td style="padding:3px 18px;text-align:center;">~8M (≈6×)</td><td style="padding:3px 18px;">should mostly hold</td></tr>
-</table>
+<div style="font-family:'SFMono-Regular',Consolas,monospace;font-size:12.5px;line-height:1.7;background:#fafafa;border:1px solid #ececec;border-radius:4px;padding:12px 14px;margin:18px 0;color:#333;white-space:pre-wrap;">rank 1     law: ~190 kbit  →  budget ~47k tokens     we train on ~8M (170×)  →  <span style="color:#c0392b;">should collapse</span>
+rank 16    law: ~3.7 Mbit  →  budget ~0.9M tokens    we train on ~8M (9×)    →  might hold</div>
 
 If the adapter stored language the way it stores random facts, rank 1 would collapse and rank 16 would pull far ahead.
 
-*Reality (measured).* Neither happens. Rank does nothing; what moves the gain is how unfamiliar the language is to the base (reduction in test loss, nats/token, at 25.6k examples):
-
 <table style="margin:16px auto;border-collapse:collapse;font-size:13.5px;color:#333;">
 <tr style="border-bottom:1px solid #ccc;color:#666;text-align:left;"><th style="padding:4px 18px;">base</th><th style="padding:4px 18px;">language</th><th style="padding:4px 18px;">base test loss</th><th style="padding:4px 18px;">gain @ rank 1</th><th style="padding:4px 18px;">gain @ rank 16</th></tr>
-<tr><td style="padding:3px 18px;">1B</td><td style="padding:3px 18px;">Hindi</td><td style="padding:3px 18px;text-align:center;">1.44</td><td style="padding:3px 18px;text-align:center;">+0.13</td><td style="padding:3px 18px;text-align:center;">+0.12</td></tr>
-<tr><td style="padding:3px 18px;">1B</td><td style="padding:3px 18px;">German</td><td style="padding:3px 18px;text-align:center;">2.55</td><td style="padding:3px 18px;text-align:center;">+0.06</td><td style="padding:3px 18px;text-align:center;">+0.06</td></tr>
-<tr><td style="padding:3px 18px;">1B</td><td style="padding:3px 18px;">Turkish</td><td style="padding:3px 18px;text-align:center;">2.80</td><td style="padding:3px 18px;text-align:center;">+0.18</td><td style="padding:3px 18px;text-align:center;">+0.17</td></tr>
-<tr style="border-bottom:1px solid #ddd;"><td style="padding:3px 18px;">1B</td><td style="padding:3px 18px;">Swahili</td><td style="padding:3px 18px;text-align:center;">3.70</td><td style="padding:3px 18px;text-align:center;"><b>+0.71</b></td><td style="padding:3px 18px;text-align:center;"><b>+0.68</b></td></tr>
-<tr><td style="padding:3px 18px;">530M</td><td style="padding:3px 18px;">Hindi</td><td style="padding:3px 18px;text-align:center;">1.59</td><td style="padding:3px 18px;text-align:center;">+0.16</td><td style="padding:3px 18px;text-align:center;">+0.16</td></tr>
-<tr><td style="padding:3px 18px;">530M</td><td style="padding:3px 18px;">German</td><td style="padding:3px 18px;text-align:center;">2.87</td><td style="padding:3px 18px;text-align:center;">+0.06</td><td style="padding:3px 18px;text-align:center;">+0.05</td></tr>
-<tr><td style="padding:3px 18px;">530M</td><td style="padding:3px 18px;">Turkish</td><td style="padding:3px 18px;text-align:center;">3.11</td><td style="padding:3px 18px;text-align:center;">+0.21</td><td style="padding:3px 18px;text-align:center;">+0.20</td></tr>
-<tr><td style="padding:3px 18px;">530M</td><td style="padding:3px 18px;">Swahili</td><td style="padding:3px 18px;text-align:center;">4.20</td><td style="padding:3px 18px;text-align:center;"><b>+0.94</b></td><td style="padding:3px 18px;text-align:center;"><b>+0.92</b></td></tr>
+<tr><td style="padding:3px 18px;vertical-align:middle;" rowspan="4">1B</td><td style="padding:3px 18px;">Hindi</td><td style="padding:3px 18px;text-align:center;">2.08</td><td style="padding:3px 18px;text-align:center;">+0.19</td><td style="padding:3px 18px;text-align:center;">+0.17</td></tr>
+<tr><td style="padding:3px 18px;">German</td><td style="padding:3px 18px;text-align:center;">3.68</td><td style="padding:3px 18px;text-align:center;">+0.09</td><td style="padding:3px 18px;text-align:center;">+0.09</td></tr>
+<tr><td style="padding:3px 18px;">Turkish</td><td style="padding:3px 18px;text-align:center;">4.04</td><td style="padding:3px 18px;text-align:center;">+0.26</td><td style="padding:3px 18px;text-align:center;">+0.25</td></tr>
+<tr style="border-bottom:1px solid #ddd;"><td style="padding:3px 18px;">Swahili</td><td style="padding:3px 18px;text-align:center;">5.34</td><td style="padding:3px 18px;text-align:center;"><b>+1.02</b></td><td style="padding:3px 18px;text-align:center;"><b>+0.98</b></td></tr>
+<tr><td style="padding:3px 18px;vertical-align:middle;" rowspan="4">530M</td><td style="padding:3px 18px;">Hindi</td><td style="padding:3px 18px;text-align:center;">2.29</td><td style="padding:3px 18px;text-align:center;">+0.23</td><td style="padding:3px 18px;text-align:center;">+0.23</td></tr>
+<tr><td style="padding:3px 18px;">German</td><td style="padding:3px 18px;text-align:center;">4.14</td><td style="padding:3px 18px;text-align:center;">+0.09</td><td style="padding:3px 18px;text-align:center;">+0.07</td></tr>
+<tr><td style="padding:3px 18px;">Turkish</td><td style="padding:3px 18px;text-align:center;">4.49</td><td style="padding:3px 18px;text-align:center;">+0.30</td><td style="padding:3px 18px;text-align:center;">+0.29</td></tr>
+<tr><td style="padding:3px 18px;">Swahili</td><td style="padding:3px 18px;text-align:center;">6.06</td><td style="padding:3px 18px;text-align:center;"><b>+1.36</b></td><td style="padding:3px 18px;text-align:center;"><b>+1.33</b></td></tr>
 </table>
 
-Rank 1 matches rank 16 within $0.03$ nats in all eight cells, even at 200× its supposed storage budget. The gain tracks the base instead: Swahili, the language the base knows least, gains $10\times$ more than German. (Hindi only looks familiar because Devanagari fragments into many cheap tokens; its gain is still rank-flat.) The storage meter says a rank-1 adapter should be hopeless here. It is not.
+*Result.* Our hypothesis on the effectiveness of rank on Aya is negative. What moves the gain is how unfamiliar the language is to the base (reduction in test loss, bits/token, at 25.6k examples). Rank 1 matches rank 16 within $0.05$ bits in all eight cells, even at 200× its supposed storage budget. The gain tracks the base instead: Swahili, the language the base knows least, gains $10\times$ more than German.[^hindi] Our capacity math says a rank-1 adapter would be hopeless here, but it is not.
 
-**Why rank 1 suffices even here.** Our hypothesis treated the task as storage: one independent fact per direction, so $D$ facts need a rank-$D$ update and capacity is the wall. That is true for random facts, and only for random facts.
+**Why rank 1 might suffice.** Our hypothesis treated language as storage with one independent fact per direction. However, our result suggests a language update is high-information yet low-rank. Linguistically, a language has properties a transformer can learn well (eg. word order, morphology), so one small correction could cover more sentences, which carries over to sentences the adapter never saw.
 
-A real task asks for one transformation, shared by every example. Learning a language is closer to learning to *speak* than to memorizing a phone book. The adapter that produces Swahili is a single low-rank correction to a base that already has the general machinery, and it generalizes to sentences it never saw. Ten times more data does not grow that update's rank; it just estimates the same update better. The training tokens are never stored. **Information is not rank**: a task can carry far more bits than another yet need fewer directions, because what matters is whether the update is one shared transformation or a pile of independent facts.
+**Aya (8 languages).** We can stress test the hypothesis further by training a single adapter on eight typologically diverse languages across five scripts. If each language were its own direction, the combined update should need eight. In reality, our effective rank stays near $1.5$. The languages appear to share a cross-lingual subspace, and the combined update remains one correction. The spectrum graph will elaborate on this result.
 
-**Pooling eight languages.** We then tried to break the picture. If one language is one direction, eight should need eight. We trained a single adapter on eight typologically diverse languages across five scripts. Effective rank stayed near $1.5$, whether one language or eight. The languages share a cross-lingual subspace, so even the eight-way update is one correction.
+### Super-NaturalInstructions: Massive multitask
 
-### Super-NaturalInstructions: pooling unrelated tasks
+In the same spirit, Super-NLI can help us test our capacity laws in the massive multi-task setting. Languages might share a subspace, but genuinely different tasks might not. We combine eight task types from Super-NLI (arithmetic, NER, summarization, sentiment, POS tagging, QA) into one adapter. Here, the effective rank was $\approx 2$ and did not climb with the number of tasks. In fact, the effective rank fell, potentially as a shared <b>instruction following direction</b> absorbed much of the update. Our NLI unrelated tasks are not especially orthogonal in weight space.
 
-Languages might share a subspace, but genuinely different tasks should not. We pool eight task types from Super-NaturalInstructions (arithmetic, NER, summarization, sentiment, POS tagging, QA) into one adapter. Effective rank was $\approx 2$ and did not climb with the number of tasks — if anything it fell, as a shared instruction-following direction absorbed more of the update. Even unrelated tasks share the follow-the-format structure, so they are not orthogonal in weight space.
+### PopQA: Long tail facts
 
-### PopQA: real facts from the long tail
+The real-world task closest to our synthetic set is [PopQA](https://arxiv.org/abs/2212.10511), real Wikidata facts phrased as single-answer questions ("What is the capital of ___?"). Some of its entities are famous and some are obscure, measured by the Wikipedia pageviews of the subject entity. We split the dataset into three popularity bins — **head** (popular entities), **torso** (middle), and **tail** (obscure) — and finetune on each. Our bet is on the tail. An obscure entity barely appears in pretraining, so facts about it should be the closest thing to our random triples, and the adapter should have to store them.
 
-The last objection is real memorization. We take [PopQA](https://arxiv.org/abs/2212.10511), real Wikidata facts phrased as questions, and split it by entity popularity, expecting obscure long-tail facts to behave like our synthetic ones. They did not (gains in nats/token; compare memorization's effective rank of $\approx 14$):
+Once again, our hypothesis is negative. Gains are rank-flat and the update stays near one direction in every bin as measured by bits/token (in contrast, random fact memorization sits at effective rank $\approx 14$):
 
 
 <table style="margin:16px auto;border-collapse:collapse;font-size:13.5px;color:#333;">
 <tr style="border-bottom:1px solid #ccc;color:#666;text-align:left;"><th style="padding:4px 18px;">PopQA bin (1B)</th><th style="padding:4px 18px;">median pageviews</th><th style="padding:4px 18px;">gain @ rank 1</th><th style="padding:4px 18px;">gain @ rank 16</th><th style="padding:4px 18px;">effective rank</th></tr>
-<tr><td style="padding:3px 18px;">tail (obscure)</td><td style="padding:3px 18px;text-align:center;">208</td><td style="padding:3px 18px;text-align:center;">+1.52</td><td style="padding:3px 18px;text-align:center;">+1.53</td><td style="padding:3px 18px;text-align:center;">1.7</td></tr>
-<tr><td style="padding:3px 18px;">torso</td><td style="padding:3px 18px;text-align:center;">572</td><td style="padding:3px 18px;text-align:center;">+0.79</td><td style="padding:3px 18px;text-align:center;">+0.68</td><td style="padding:3px 18px;text-align:center;">2.0</td></tr>
-<tr><td style="padding:3px 18px;">head (popular)</td><td style="padding:3px 18px;text-align:center;">3592</td><td style="padding:3px 18px;text-align:center;">+1.24</td><td style="padding:3px 18px;text-align:center;">+1.11</td><td style="padding:3px 18px;text-align:center;">1.9</td></tr>
+<tr><td style="padding:3px 18px;">tail (obscure)</td><td style="padding:3px 18px;text-align:center;">208</td><td style="padding:3px 18px;text-align:center;">+2.19</td><td style="padding:3px 18px;text-align:center;">+2.21</td><td style="padding:3px 18px;text-align:center;">1.7</td></tr>
+<tr><td style="padding:3px 18px;">torso</td><td style="padding:3px 18px;text-align:center;">572</td><td style="padding:3px 18px;text-align:center;">+1.14</td><td style="padding:3px 18px;text-align:center;">+0.98</td><td style="padding:3px 18px;text-align:center;">2.0</td></tr>
+<tr><td style="padding:3px 18px;">head (popular)</td><td style="padding:3px 18px;text-align:center;">3592</td><td style="padding:3px 18px;text-align:center;">+1.79</td><td style="padding:3px 18px;text-align:center;">+1.60</td><td style="padding:3px 18px;text-align:center;">1.9</td></tr>
 </table>
 
-Long-tail factual QA still *generalizes*. The answers are real entities the base already represents, so the adapter re-aims existing pathways rather than storing new bits, and one or two directions are enough.
+Long-tail factual QA still *generalizes*. The answers are real entities the base already represents, so the adapter build on existing pathways rather than storing new bits, and one or two directions are enough.
 
 ### Rank tracks structure, not data
 
-Across single languages, pooled languages, pooled task types, and long-tail facts: **every real task we measured used an effective rank of 1 to 3, while random facts spread across ~14.** The task sets the rank, not the data budget. Growing the fact set from 500 to 549k pushes the memorization rank toward the ceiling; every real task stays at 1 to 3 no matter how much data it sees.
+Across single languages, multilingual injection, massive multi-task, and long-tail facts: **every real task we measured used an effective rank of 1 to 3, while random facts spread across ~14.** Even when we stress test the adapter, such as growing the fact set from 500 to 549k, every real task stays at 1 to 3 regardless of how much data it sees.
 
-The cleanest view of this is the spectrum of the update itself. Each adapted layer's $\Delta W$ decomposes by SVD into independent directions, $\Delta W = \sum_i \sigma_i\, u_i v_i^\top$, with $\sigma_i$ the strength of each. We normalize the 16 singular values of each layer to sum to one, so only the *shape* matters, and average over the 65 layers. A spectrum piled onto $\sigma_1$ is a one-direction update; a flat spectrum fills all sixteen:
+Visually, we can observe the spectrum of the updates themselves. Each adapted layer's $\Delta W$ decomposes by SVD into independent directions, $\Delta W = \sum_i \sigma_i\, u_i v_i^\top$, with $\sigma_i$ the strength of each. We normalize the 16 singular values of each layer to sum to one (only the *shape* matters), and average over the 65 layers. A spectrum piled onto $\sigma_1$ is a single-direction update; a flat spectrum fills all sixteen:
 
 <figure style="margin:26px 0;text-align:center;">
 <div id="hm-widget" style="position:relative;width:100%;margin:8px 0 4px 0;font-family:inherit;color:#333;">
@@ -581,7 +578,7 @@ var ROWS=[
  {lab:"SuperNI · 8 tasks (2.1)",s:[0.8484,0.0548,0.0221,0.0132,0.0098,0.0079,0.0068,0.006,0.0053,0.0048,0.0043,0.004,0.0037,0.0033,0.0031,0.0027]},
  {lab:"Swahili (1.5)",s:[0.8872,0.0765,0.011,0.0054,0.0036,0.0029,0.0023,0.0019,0.0016,0.0015,0.0013,0.0012,0.0011,0.001,0.0009,0.0008]},
  {lab:"German (1.5)",s:[0.8824,0.0714,0.0137,0.0072,0.0047,0.0035,0.0028,0.0024,0.0021,0.0018,0.0017,0.0015,0.0014,0.0012,0.0011,0.001]},
- {lab:"8 languages pooled (1.5)",s:[0.891,0.0667,0.0151,0.0071,0.004,0.0029,0.0023,0.0019,0.0016,0.0014,0.0012,0.0011,0.001,0.0009,0.0008,0.0007]}];
+ {lab:"8 languages combined (1.5)",s:[0.891,0.0667,0.0151,0.0071,0.004,0.0029,0.0023,0.0019,0.0016,0.0014,0.0012,0.0011,0.001,0.0009,0.0008,0.0007]}];
 var svg=document.getElementById("hm-svg"),tip=document.getElementById("hm-tip"),widget=document.getElementById("hm-widget");
 function txt(x,y,str,c,sz,anc,w){return '<text x="'+x+'" y="'+y+'" font-size="'+(sz||11)+'" font-weight="'+(w||400)+'" fill="'+(c||"#555")+'" text-anchor="'+(anc||"middle")+'">'+str+'</text>';}
 var STOPS=[[0,0,4],[40,11,84],[120,28,109],[197,58,88],[242,124,74],[252,220,140]];
@@ -590,7 +587,7 @@ function col(v){var t=(Math.log(Math.max(v,1e-3))/Math.LN10+3)/3;t=Math.max(0,Ma
   return 'rgb('+Math.round(a[0]+(b[0]-a[0])*u)+','+Math.round(a[1]+(b[1]-a[1])*u)+','+Math.round(a[2]+(b[2]-a[2])*u)+')';}
 var ML=168,MR=70,MT=38,MB=42,W=720,H=312,PW=W-ML-MR,PH=H-MT-MB,NC=16;
 var cw=PW/NC,rh=PH/ROWS.length;
-var s=txt(ML+PW/2,20,"Memorization fills the spectrum; skills collapse to one direction","#333",13,"middle",600);
+var s=txt(ML+PW/2,20,"Memorization fills the spectrum; other tasks collapse to one direction","#333",13,"middle",600);
 ROWS.forEach(function(d,i){var y=MT+i*rh;
   s+=txt(ML-9,y+rh/2+3.5,d.lab,"#333",10.5,"end");
   for(var j=0;j<NC;j++){var x=ML+j*cw;
@@ -609,45 +606,37 @@ svg.addEventListener("mousemove",function(ev){var t=ev.target;if(t&&t.getAttribu
 svg.addEventListener("mouseleave",function(){tip.style.display="none";});
 })();
 </script>
-<figcaption style="font-size:12px;color:#777;margin-top:6px;">Mean singular-value spectrum of ΔW across the 65 adapted matrices (rank-16 adapters, 1B base); each row normalized to sum 1, log color scale. The number after each label is the effective rank. Random facts spread weight across all 16 directions; every real task, including pooled multilingual and multi-task adapters, collapses onto the first direction. Same base, same rank, only the task differs. Hover any cell for its value.</figcaption>
+<figcaption style="font-size:12px;color:#777;margin-top:6px;">Mean singular-value spectrum of ΔW across the 65 adapted matrices (rank-16 adapters, 1B base); each row normalized to sum 1, log scale. The number after each label is the effective rank. Hover any cell for its value.</figcaption>
 </figure>
 
-This lines up with Morris et al., who argue you cannot read memorization off a model's behavior. Producing a fact, or a large likelihood gain, is equally consistent with generalization: *"a language model prompted to add two numbers can output the answer without having seen the equation before."* PopQA is a case in point, where obscure facts show a big drop in test loss that looks like memorization but is a low-rank, generalizing update. Their remedy separates the two at the *loss* level, by decomposing memorization against a reference model. The adapter's *rank* separates them in the *weights*, since memorization fills it and generalization does not. These are two lenses on the same distinction, and it is a real one.
+The spectrum makes the two regimes visible at a glance. Random facts spread their weight across all sixteen directions, while every real task piles onto the first one or two, including the combined 8-language and 8-task adapters.
 
-**The practical reading.** Across these tasks the binding constraint is data and base quality, not adapter rank. Capability is bought with more examples or a stronger base, and among LoRA ranks, rank 1 is already enough, since more rank does not help. The synthetic sweeps set the rank you would need to *memorize* a dataset outright, and real fine-tuning, being low-rank, sits far below that ceiling. Rank becomes the constraint only when a task looks like memorization. This is not ours alone. It traces back to Aghajanyan et al.'s finding that fine-tuning has a tiny intrinsic dimension, and it matches Schulman et al.'s *LoRA Without Regret*, which argues from capacity that rank 1 already exceeds what most post-training needs and that rank only bites once the adapter runs out of capacity. The one place the literature sees rank clearly matter, Biderman et al.'s *LoRA Learns Less* on code and math, is exactly the information-dense, memorization-like regime our spectrum picks out.
+**The practical reading.** Once again, we can see that binding constraint is data and base quality, rather than adapter rank, where capability can be bought with more examples or a stronger base.
+
+**Previous works.** Morris et al. emphasize the difficulty of separating memorization from the rest of a model's behavior: *"a language model prompted to add two numbers can output the answer without having seen the equation before."* PopQA is a case in point here. Obscure facts show a large loss drop that looks like memorization, yet the update is low-rank and generalizing. Their remedy separates the two in the loss, decomposing against a reference model pretrained from scratch; our adapter's rank separates them in the weights, since memorization fills up the ranks and generalization does not. The rank-flatness itself is an older thread. Aghajanyan et al. found that fine-tuning has a tiny intrinsic dimension, and Schulman et al.'s *LoRA Without Regret* argues from capacity that rank 1 already exceeds what most post-training needs. The one place the literature sees rank clearly bite, Biderman et al.'s *LoRA Learns Less*, finds LoRA trailing full fine-tuning on code and math, with the gap closing only as rank grows — exactly the information-dense, memorization-like regime our spectrum picks out.
 
 ## How to know the smallest rank?
 
-The smallest rank that does the job is the one worth shipping. It is the cheapest to store, to serve, and to merge back into the base, and it leaves no capacity idle. The usual way to find it is to sweep several ranks and compare, which multiplies the training cost for a number you only use once. The results above point to a cheaper route, because rank is fixed by task structure rather than by data volume. Picking a rank then comes down to two quantities: how many bits a rank-$r$ adapter can store, and how many the task needs it to.
+In production, we are always interested in shipping the smallest rank. It is the cheapest to store, to serve, to merge back into the base, and leaves no capacity idle. The usual way to find out is to sweep several ranks for a comparison, which multiplies the number of training runs. The results above point to a cheaper route, given that we have observed adapter rank is fixed by task structure rather than by data volume.
 
-*Capacity* is what a rank-$r$ adapter can hold. It stores about $b\,p(r)$ bits, where $p(r)$ is its trainable-parameter count and $b\approx 0.05$–$0.4$ is the bits stored per parameter, fixed by the base. This is the capacity law of the previous section.
-
-*Requirement* is what the task needs to store: its incompressible content given the base, the part that cannot be folded into a transformation the base already computes. A skill such as a language, instruction-following, or factual QA is one such transformation re-aimed, so its requirement is a direction or two and does not grow with the number of training examples. Memorizing $N$ arbitrary facts requires $N\log_2 V$ bits, which does not compress and grows with the dataset. Real tasks fall between these limits.
-
-The appropriate rank is the smallest $r$ at which capacity covers the requirement:
-
-$$r^\ast \;=\; \min\Big\{\, r \;:\; b(N,T)\,p(r) \;\ge\; I_{\text{incompressible}}(\text{task}\mid\text{base}) \,\Big\}.$$
-
-For a skill the right-hand side is small and $r^\ast\approx 1$; for structureless memorization it equals the dataset entropy and $r^\ast$ grows with the data.
-
-The difficulty is estimating the requirement, which is not recoverable from the frozen base. In our experiments the rank of the loss gradient at initialization does not predict the rank of the converged update. The update's rank is a property of the optimization trajectory, not of the initial geometry, so it is not available before training.
+Unfortunately, task structure is hard to gauge. Two things set the rank a task needs: enough directions to express the transformation itself, which is 1 to 3 for every real task we measured, and enough capacity to cover whatever must be stored outright. Real tasks are bound by the first; pure fact memorization by the second. Neither can be read off the frozen base. In our experiments, the rank of the loss gradient at initialization does not predict the rank of the converged update — the update's rank is a property of the optimization trajectory, not of the initial geometry. Instead of predicting the rank, we can measure it via a quick adapter training run.
 
 ### A simple method
 
-Training cost is nearly independent of rank: for the 1B base a rank-32 adapter is about 0.2% of the trainable parameters, so rank 32 and rank 4 cost essentially the same. The usual reason to search over rank therefore disappears. We train once at a generous fixed rank $R$ — 32 to 64 covers every task here, and real tasks need far less — and recover the rank the task needs from that single run.
+Training cost is nearly independent of rank: for the 1B base a rank-32 adapter is only about 0.2% of the trainable parameters, so rank 32 and rank 4 are both reasonably cheap. The usual reason to search over rank therefore disappears. We train once at a generous fixed rank $R$ (32 or 64), and recover the rank the task needs from that single run.
 
 Make the target precise. Fix a tolerance $\epsilon$, write $\Delta W^\star$ for a converged rank-$R$ update and $\Delta W^\star_k$ for its rank-$k$ SVD truncation, and let $\mathcal{L}$ be the held-out loss. The rank worth deploying is the smallest that surrenders no more than $\epsilon$ of the achievable loss reduction,
 
 $$r^\star \;=\; \min\big\{\, k \;:\; \mathcal{L}(\Delta W^\star_k) \;\le\; \mathcal{L}(\Delta W^\star) + \epsilon \,\big\}.$$
 
-The point is that $r^\star$ is a property of the *already-trained* $\Delta W^\star$, so no retraining is needed to find it. By the Eckart–Young–Mirsky theorem the top-$k$ truncation $\Delta W^\star_k$ is the optimal rank-$k$ approximation of $\Delta W^\star$, and it differs from it by exactly the discarded tail, $\lVert \Delta W^\star - \Delta W^\star_k\rVert_F^2 = \sum_{i>k}\sigma_i^2$. Where the loss varies smoothly with the weights, a small tail means a small change in loss, so the spectrum of a single generous run pins down $r^\star$.
+The point is that $r^\star$ is a property of the *already-trained* $\Delta W^\star$, so no retraining is needed to find it. Per the [Eckart–Young–Mirsky theorem](https://en.wikipedia.org/wiki/Low-rank_approximation), the top-$k$ SVD truncation is the best rank-$k$ approximation of a matrix you can make, and its error is exactly the singular values you threw away, $\lVert \Delta W^\star - \Delta W^\star_k\rVert_F^2 = \sum_{i>k}\sigma_i^2$. As long as the loss varies smoothly with the weights, a small tail means a small change in loss, and the spectrum of one generous run pins down $r^\star$.
 
-**Procedure.** Given a base, task data, a generous rank $R$, and tolerance $\epsilon$:
+**Algorithm.** Given a base, task data, a "generous" rank $R$, and tolerance $\epsilon$:
 
 <div style="margin:18px 0;padding:16px 20px;background:#f6f8fa;border:1px solid #e4e9ee;border-radius:8px;display:flex;flex-direction:column;gap:10px;">
   <div style="display:flex;gap:14px;align-items:baseline;">
     <span style="flex:0 0 auto;font-size:15px;font-weight:700;color:#3182bd;">1</span>
-    <div style="line-height:1.6;font-size:13.5px;"><b>Train once, generously.</b> Fit the adapter at rank $R$ (here 32) to convergence. No rank sweep.</div>
+    <div style="line-height:1.6;font-size:13.5px;"><b>Train once, generously.</b> Fit the adapter at rank $R$ to convergence.</div>
   </div>
   <div style="display:flex;gap:14px;align-items:baseline;">
     <span style="flex:0 0 auto;font-size:15px;font-weight:700;color:#3182bd;">2</span>
@@ -655,7 +644,7 @@ The point is that $r^\star$ is a property of the *already-trained* $\Delta W^\st
   </div>
   <div style="display:flex;gap:14px;align-items:baseline;">
     <span style="flex:0 0 auto;font-size:15px;font-weight:700;color:#3182bd;">3</span>
-    <div style="line-height:1.6;font-size:13.5px;"><b>Read off the rank.</b> $r^\star$ is the smallest $k$ that keeps $1-\epsilon$ of the spectral energy, $\sum_{i\le k}\sigma_i^2 / \sum_i \sigma_i^2$.</div>
+    <div style="line-height:1.6;font-size:13.5px;"><b>Read off the rank.</b> $r^\star$ is the smallest $k$ that keeps $1-\epsilon'$ of the spectral energy, $\sum_{i\le k}\sigma_i^2 / \sum_i \sigma_i^2$ — a weight-space proxy for the loss tolerance, justified by Eckart–Young–Mirsky above.</div>
   </div>
   <div style="display:flex;gap:14px;align-items:baseline;">
     <span style="flex:0 0 auto;font-size:15px;font-weight:700;color:#3182bd;">4</span>
@@ -663,11 +652,7 @@ The point is that $r^\star$ is a property of the *already-trained* $\Delta W^\st
   </div>
 </div>
 
-<!-- <p style="font-size:12px;color:#777;margin:-6px 0 18px;">Details: the median effective rank $\exp(-\sum_i p_i \log p_i)$, $p_i = \sigma_i/\sum_j \sigma_j$, is a convenient scalar estimate for step 3 that needs no held-out set. The refold in step 4 is $B_\ell \leftarrow U_\ell[:,{\le}\,r^\star]$, $A_\ell \leftarrow \Sigma_\ell[{\le}\,r^\star]\,V_\ell[:,{\le}\,r^\star]^\top/(\alpha/R)$.</p> -->
-
-There is no second training run. The shipped adapter is a truncation of the one you already trained, obtained by an SVD in seconds, not a fresh model retrained at $r^\star$. Training happens once, at rank $R$.
-
-**Validation.** To confirm the measured rank is the rank the task needs, we truncate each trained rank-32 adapter to rank $k$ by its rank-$k$ SVD and re-measure the test loss, with no retraining. The regimes separate cleanly. For the three real tasks the loss is already at its floor by rank 1 and stays flat out to rank 32, so truncating to a single direction costs nothing; on PopQA it is even slightly better at rank 1, where the discarded directions were fitting noise. A skill's $\Delta W$ already lives in one or two directions, so its rank-1 approximation reconstructs almost the entire update, not a fragment of it. Random-fact recall is the opposite: the loss keeps falling all the way to rank 32, since each direction stores more facts. The measured effective rank therefore coincides with the rank the task uses, and whether truncation is free or costly identifies the regime after the fact. The rank trajectory during training carries the same signal earlier: a skill's $\Delta W$ collapses toward a single direction while memorization rises in rank, and the sign of that trend separates the two well before convergence.
+**Results.** To confirm the measured rank is the rank the task needs, we truncate each trained rank-32 adapter to rank $k$ by its rank-$k$ SVD and remeasure the test loss, with no retraining. The regimes separate cleanly. For the three real tasks the loss is already at its floor by rank 1 and stays flat out to rank 32. Interestingly, the <b>truncated adapter for PopQA</b> is even slightly better at rank 1, where discarding directions acts as helpful _regularization_. A skill's $\Delta W$ already lives in one or two directions, so its rank-1 approximation reconstructs almost the entire update. Random-fact recall is the opposite: the loss keeps falling all the way to rank 32, since each direction stores more facts. The measured effective rank therefore coincides with the rank the task uses, and whether truncation is free or costly identifies the regime after the fact. The rank trajectory shows the same signal even earlier: a skill's update collapses toward one direction over training while memorization climbs, so the direction of the trend separates the two well before convergence.
 
 <figure style="margin:26px 0;text-align:center;">
 <div id="rt-widget" style="position:relative;width:100%;margin:8px 0 4px 0;font-family:inherit;color:#333;">
@@ -689,7 +674,7 @@ var Xa=l10(18),Xb=l10(24000),Ya=0,Yb=l10(26);
 function xp(v){return ML+(l10(v)-Xa)/(Xb-Xa)*PW;}
 function yp(v){return MT+(1-(l10(v)-Ya)/(Yb-Ya))*PH;}
 var s='<rect x="'+ML+'" y="'+MT+'" width="'+PW+'" height="'+PH+'" fill="none" stroke="#ddd"/>';
-s+=txt(ML+PW/2,24,"Rank fills for memorization, collapses for skills","#333",13,"middle",600);
+s+=txt(ML+PW/2,24,"Trajectory of effective ranks across tasks","#333",13,"middle",600);
 [1,2,5,10,20].forEach(function(t){var Y=yp(t);s+='<line x1="'+ML+'" y1="'+Y+'" x2="'+(ML+PW)+'" y2="'+Y+'" stroke="#f4f4f4"/>'+txt(ML-8,Y+3,""+t,"#999",10,"end");});
 [20,100,1000,10000].forEach(function(t){var X=xp(t);s+='<line x1="'+X+'" y1="'+MT+'" x2="'+X+'" y2="'+(MT+PH)+'" stroke="#f6f6f6"/>'+txt(X,MT+PH+16,t>=1000?(t/1000)+"k":""+t,"#999",10);});
 s+=txt(ML+PW/2,H-8,"training step (log)","#666",12);
@@ -706,21 +691,17 @@ SERIES.forEach(function(d,j){var yy=ly+j*17;
 svg.innerHTML=s;
 })();
 </script>
-<figcaption style="font-size:12px;color:#777;margin-top:2px;">Effective rank of ΔW over a single rank-32 training run (1B base, log–log). Each dot is a checkpoint. Both random-fact sizes climb as facts accumulate — the 8k set faster, since at a fixed step count it has made more passes over its data — while the real tasks fall to rank 1–2 within a few hundred steps and stay there. The direction of the trend, not its height, marks the regime.</figcaption>
+<figcaption style="font-size:12px;color:#777;margin-top:2px;">Effective rank of ΔW over a single rank-32 training run (1B base, log–log). Each dot is a checkpoint. Both random-fact sizes climb as facts accumulate — the 8k set faster, since at a fixed step count it has made more passes over its data — while the real tasks fall to rank 1–2 within a few hundred steps and stay there.</figcaption>
 </figure>
 
-The procedure needs one training run and no rank search, and the deployed adapter is as small as the task permits. When measurement is not worth the trouble, two shortcuts suffice. Structured, generalizing tasks want rank 1 to 8 (we measure 1 to 3, so 8 is a safety margin). Deliberate memorization should be sized from the budget, $r \gtrsim (N\log_2 V)/(b\cdot\text{params-per-rank})$.
-
-Three things follow from reading rank this way. The effective rank of $\Delta W$ is a memorization detector taken from the weights alone: it is high when a task stores data and low when it generalizes, so a rank that climbs during fine-tuning flags memorization while it happens, with no reference model needed. Because truncation is lossless for a low-rank update, the rank sweep is avoidable, and one generous run plus a truncation gives the adapter to ship. And truncation is occasionally better than the original, as on PopQA, when the directions it removes were fitting noise.
-
+The truncated adapter also holds for decoding, not just test loss. From greedy generation, the rank-1 version reproduces the full-rank outputs almost token for token, and PopQA exact-match is flat from rank 1 (about 0.15, against 0 for the frozen base) while random fact recall again climbs with rank. So the truncation is capable of preserving generation quality, not only its likelihood.
 
 ## Limitations
 
 - Our experiments are limited to a dense transformer architecture and the layers where LoRA is applied.
-- Every adapter keeps the token embeddings and LM head frozen, with LoRA on the attention and MLP linear layers only. For tasks that shift the token distribution, such as a new language or script, also adapting the embeddings may add capability that a linear-only adapter cannot reach. We saw hints of this on the multilingual task and did not pursue it further.
+- Every adapter keeps the token embeddings and LM head frozen, with LoRA on the attention and MLP linear layers only. For tasks that shift the token distribution, such as a new language, training the embeddings may add capability that our adapter architecture cannot reach. We saw hints of this on the multilingual task, but did not pursue it further.
 - We lightly tune learning rates across all experiments, but cannot guarantee that they are optimal.
-- The rank a task needs is set by its incompressible complexity, which we currently *measure* (from the converged or trajectory rank) rather than *predict* a priori. A predictor that reads it off the base and data without training would complete a full rank law $r^\ast = f(\text{complexity}, \text{base})$.
-- Task gains are measured as test loss, not task accuracy. The reductions on PopQA and Aya are large and well above noise, but we have not confirmed that truncation preserves exact-match accuracy or generation quality, only likelihood.
+- Task gains are measured mainly as test loss. We spotchecked greedy generation under truncation and found the rank-1 adapter reproduces the full adapter's outputs (PopQA exact-match flat from rank 1; fact recall climbing with rank), buthave not run a broad downstream evaluation across all tasks.
 
 ## Notation
 
@@ -776,6 +757,8 @@ If you find this useful, please cite it as:
 ```
 
 Tai Nguyen. "Capacity of a LoRA Adapter (Part 1)." 2026. [taidnguyen.github.io/blog/lora-capacity](https://taidnguyen.github.io/blog/lora-capacity/)
+
+[^hindi]: Hindi looks like the most familiar language in the table, which is suspicious for an English-pretrained base. I suspect that the low loss is a tokenizer artifact. The OLMo tokenizer contains little Devanagari, so it shatters Hindi text into many tiny tokens, and each tiny token is easy to predict on its own. A Hindi sentence might simply spend many more tokens than a German one. Regardless, Hindi's gain is still flat in rank so our claim still stands.
 
 [^bitsrecall]: Stored bits and recall are two readouts of the same per-fact distribution $P(a \mid q)$. Bits integrate the model's confidence ($\log_2 V - \text{NLL}$), so they can go negative once overwriting makes the model worse than a uniform guess on old facts. Recall thresholds the same distribution (is the top answer right?), so it is bounded between chance and one. Below $D_c$ the two move together; past it, overwriting is visible only in bits, while recall floors at chance.
 
