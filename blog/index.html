@@ -1,40 +1,25 @@
 ---
 layout: page
-title: Writing
+title: Blog
 permalink: /blog/
 ---
-
-<style>
-  .wtab {
-    background: none; border: none; border-bottom: 2px solid transparent;
-    font-family: inherit; font-size: 14px; font-weight: 700; color: #999;
-    padding: 4px 12px 6px; cursor: pointer;
-  }
-  .wtab.active { color: #111; border-bottom-color: #111; }
-  .wtab:hover { color: #111; }
-</style>
 
 <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
   <tr>
     <td style="padding:2% 0.7%;vertical-align:middle">
       <p><a href="/">← Home</a></p>
-      <h1 style="text-align:left;font-size:26px;margin-block-end:10px;">Writing</h1>
-      <div>
-        <button id="tab-ai" class="wtab active" onclick="showTab('ai')">AI</button>
-        <button id="tab-personal" class="wtab" onclick="showTab('personal')">Personal</button>
-      </div>
+      <h1 style="text-align:left;font-size:26px;margin-block-end:10px;">Blog</h1>
     </td>
   </tr>
 </table>
 
 {% assign blog_posts = site.posts | where: "categories", "blog" %}
 
-<!-- AI: every blog post except those explicitly topic: personal -->
-<div id="list-ai">
+<div>
   <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-    {% assign n_ai = 0 %}
+    {% assign n_blog = 0 %}
     {% for post in blog_posts %}{% unless post.topic == 'personal' %}
-    {% assign n_ai = n_ai | plus: 1 %}
+    {% assign n_blog = n_blog | plus: 1 %}
     <tr>
       <td style="padding:0.7%;vertical-align:top;">
         <div style="display:flex;align-items:center;gap:10px;">
@@ -57,50 +42,8 @@ permalink: /blog/
       </td>
     </tr>
     {% endunless %}{% endfor %}
-    {% if n_ai == 0 %}
+    {% if n_blog == 0 %}
     <tr><td style="padding:0.7%;"><p style="color:#555;">Nothing here yet. Check back soon.</p></td></tr>
     {% endif %}
   </table>
 </div>
-
-<!-- Personal: blog posts tagged topic: personal -->
-<div id="list-personal" style="display:none;">
-  <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;">
-    {% assign personal_posts = blog_posts | where: "topic", "personal" %}
-    {% for post in personal_posts %}
-    <tr>
-      <td style="padding:0.7%;vertical-align:top;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          {% if post.thumbnail %}
-          <img src="{{ post.thumbnail }}" alt="" style="width:40px;height:40px;object-fit:contain;flex-shrink:0;">
-          {% endif %}
-          <div>
-            <p style="margin:0 0 4px 0;">
-              <a href="{{ post.url }}" style="font-weight:700;font-size:14px;">{{ post.title }}</a>
-            </p>
-            <p style="color:#555;font-size:13px;margin:0 0 4px 0;">
-              {{ post.date | date: "%B %-d, %Y" }}
-              {% if post.read_time %}&nbsp;&middot;&nbsp;{{ post.read_time }} min read{% endif %}
-            </p>
-            {% if post.description %}
-            <p style="font-size:13px;margin:0 0 12px 0;">{{ post.description }}</p>
-            {% endif %}
-          </div>
-        </div>
-      </td>
-    </tr>
-    {% endfor %}
-    {% if personal_posts.size == 0 %}
-    <tr><td style="padding:0.7%;"><p style="color:#555;">Nothing here yet — coming soon.</p></td></tr>
-    {% endif %}
-  </table>
-</div>
-
-<script>
-  function showTab(t) {
-    document.getElementById('list-ai').style.display = (t === 'ai') ? '' : 'none';
-    document.getElementById('list-personal').style.display = (t === 'personal') ? '' : 'none';
-    document.getElementById('tab-ai').classList.toggle('active', t === 'ai');
-    document.getElementById('tab-personal').classList.toggle('active', t === 'personal');
-  }
-</script>

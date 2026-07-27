@@ -6,11 +6,13 @@ categories: blog
 topic: rl, vintage
 published: true
 permalink: /blog/self-play-1930-model/
-description: "Lessons from applying SPICE on a pre-1931 language model."
+description: "Lessons from applying SPICE on a pre-1931 language model"
 read_time: 9
 comments: false
+toc: true
+sidenotes: true
 ---
-
+## Introduction
 Two lines of LLM-related works have peaked my interests. The first is [talkie](https://talkie-lm.com/introducing-talkie), a 13B language model trained with data pre-dated 1931. The "vintage" model presents many unique angles for persona research and understanding LLM generalization. For instance, without seeing Python, talkie can get 10% of HumanEval questions, albeit with non-zero contamination risks and extreme inefficiency (pass@100). The second line of work catching my attention is much excitement around self-improving LLMs, with few papers that stand out: [Stanford paper](https://arxiv.org/abs/2604.20209), [Absolute Zero](https://arxiv.org/abs/2505.03335), and [SPICE](https://arxiv.org/abs/2510.24684). These share some common thread around models generating their own tasks, answering to the tasks via the rollout phase, and sometimes acting as its own verifier.
 
 I spend the weekend trying to combine these two threads. The main motivation is to understand whether we can achieve a lift on model capability ✨ for free ✨ when facing a data-constraint setting. The authors estimated that _talkie_ was trained only on 260B tokens. For simplicity, I;m also starting with reasoning. For example, can we get talkie to be a bit more efficient/better on HumanEval?
