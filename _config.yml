@@ -91,3 +91,6 @@ exclude:
   - todo.txt
   - _temp/index.html
   - _temp/
+
+# render future-dated posts (used for post previews)
+future: true

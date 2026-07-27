@@ -1,7 +1,7 @@
 ---
 layout: blog
 title: "Capacity of a LoRA Adapter (Part 2): Quantization"
-date: 2026-07-16
+date: 2026-08-03
 categories: blog
 topic: capacity, LoRA, quantization, scaling
 published: true
@@ -13,9 +13,9 @@ sidenotes: true
 ---
 ## Introduction
 
-[Part 1](/blog/lora-capacity/) measured how much a LoRA adapter can hold: about **0.05 to 0.4 bits per trainable parameter**, borrowed from the base and set by the base's quality. One number from that post is the seed for this one. A LoRA stores a fraction of a bit per parameter while sitting inside a **16-bit** weight. That is a 40× to 300× gap between the information the adapter carries and the precision it is stored in.
+In [Part 1](/blog/lora-capacity/), we measured that a LoRA adapter holds about **0.05 to 0.4 bits per trainable parameter**, set by the quality of its base. Meanwhile, each of those parameters sits in a **16-bit** weight. The adapter carries 40× to 300× less information than the precision it is stored in. It is mostly empty.
 
-So the adapter is mostly empty. This part asks what happens when we stop paying for the empty space. We quantize the adapter, quantize the base it borrows from, and push both toward the floor. But first, what does quantizing actually do to a weight? It snaps each weight to the nearest value on a coarse shared grid. The *scheme* decides where the grid lines fall, and the *bit-width* decides how many there are:
+This part asks what happens when we stop paying for the empty space. We quantize the adapter, then the base it borrows from, and push both toward the floor. First, what does quantization actually do to a weight? It snaps each weight to the nearest value on a coarse shared grid. The *scheme* decides where the grid lines fall, and the *bit-width* decides how many lines there are:
 
 <div id="qs-wrap" style="width:100%;margin:16px 0 4px 0;font-family:inherit;">
   <div id="qs-ctrl" style="text-align:center;margin-bottom:4px;"></div>
@@ -66,11 +66,9 @@ So the adapter is mostly empty. This part asks what happens when we stop paying 
 
 ## Outline
 
-The full write-up is coming shortly. It will cover:
+The full post lands next week. Planned sections:
 
-- **Topology of LoRA adapter weights.** What the trained weights look like, and where each quantization grid lands on them.
-- **How small can the adapter get?** The precision sweep from 16 bits down to 1, why asymmetric integer grids win, and where quantization-aware training takes over.
-- **Quantizing both base and adapter.** QLoRA-style bases, and learning under quantization noise.
-- **Putting it together.** Capacity per byte, and the cheapest way to serve an adapter.
-
-*Check back soon.*
+- **Topology of LoRA adapter weights.** What the trained weights look like and where each grid lands on them.
+- **How small can the adapter get?** A sweep from 16 bits down to 1, and why asymmetric integer grids hold up best.
+- **Quantizing base and adapter together.** QLoRA-style bases and training under quantization noise.
+- **Capacity per byte.** The cheapest way to store and serve an adapter.

@@ -1,7 +1,7 @@
 ---
 layout: blog
 title: "Capacity of a LoRA Adapter (Part 1)"
-date: 2026-07-08
+date: 2026-07-27
 categories: blog
 topic: capacity, LoRA, scaling
 published: true
