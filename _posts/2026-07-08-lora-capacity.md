@@ -533,7 +533,7 @@ If the adapter stored language the way it stores random facts, rank 1 would coll
 <tr><td style="padding:3px 18px;">Swahili</td><td style="padding:3px 18px;text-align:center;">6.06</td><td style="padding:3px 18px;text-align:center;"><b>+1.36</b></td><td style="padding:3px 18px;text-align:center;"><b>+1.33</b></td></tr>
 </table>
 
-*Result.* Our hypothesis on the effectiveness of rank on Aya is negative. What moves the gain is how unfamiliar the language is to the base (reduction in test loss, bits/token, at 25.6k examples). Rank 1 matches rank 16 within $0.05$ bits in all eight cells, even at 200× its supposed storage budget. The gain tracks the base instead: Swahili, the language the base knows least, gains $10\times$ more than German.[^hindi] Our capacity math says a rank-1 adapter would be hopeless here, but it is not.
+*Result.* Our hypothesis on the effectiveness of rank on Aya is negative. What moves the gain is how unfamiliar the language is to the base (reduction in test loss, bits/token, at 25.6k examples). Rank 1 matches rank 16 within $0.05$ bits in all eight cells, even at 170× its supposed storage budget. The gain tracks the base instead: Swahili, the language the base knows least, gains $10\times$ more than German.[^hindi] Our capacity math says a rank-1 adapter would be hopeless here, but it is not.
 
 **Why rank 1 might suffice.** Our hypothesis treated language as storage with one independent fact per direction. However, our result suggests a language update is high-information yet low-rank. Linguistically, a language has properties a transformer can learn well (eg. word order, morphology), so one small correction could cover more sentences, which carries over to sentences the adapter never saw.
 
@@ -719,9 +719,13 @@ The truncated adapter also holds for decoding, not just test loss. From greedy g
 <tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;">NLL<sub>2</sub></td><td style="padding:6px 16px;">negative log-likelihood of the answer, in bits</td></tr>
 <tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;">bits</td><td style="padding:6px 16px;">memorized bits for a fact = log<sub>2</sub><i>V</i> &minus; NLL<sub>2</sub>(answer | query)</td></tr>
 <tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;"><i>C</i></td><td style="padding:6px 16px;">capacity: the maximum memorized bits over dataset size <i>D</i></td></tr>
-<tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;"><i>b</i> = <i>C</i>/<i>p</i></td><td style="padding:6px 16px;">bits stored per adapter parameter (density), &asymp; 0.05–0.4</td></tr>
+<tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;"><i>b</i> = <i>C</i>/<i>p</i></td><td style="padding:6px 16px;">bits stored per adapter parameter (density), &asymp; 0.05–0.4 for the 20M–1B bases tested</td></tr>
 <tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;"><i>D</i><sub>c</sub></td><td style="padding:6px 16px;">capacity in facts, <i>D</i><sub>c</sub> = <i>C</i> / log<sub>2</sub><i>V</i></td></tr>
 <tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;"><i>k</i></td><td style="padding:6px 16px;">steepness of the recall curve (sigmoid exponent)</td></tr>
+<tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;">&Delta;<i>W</i></td><td style="padding:6px 16px;">the adapter's update, &Delta;<i>W</i> = (&alpha;/<i>r</i>)&thinsp;<i>BA</i>, per adapted layer</td></tr>
+<tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;">&sigma;<sub>i</sub></td><td style="padding:6px 16px;">singular values of &Delta;<i>W</i>; their normalized entropy exponentiated is the effective rank</td></tr>
+<tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;"><i>R</i>, <i>r</i><sup>&#9733;</sup></td><td style="padding:6px 16px;">generous training rank and deployed (truncation) rank</td></tr>
+<tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;">&epsilon;, &epsilon;&prime;</td><td style="padding:6px 16px;">loss tolerance for truncation, and its spectral-energy proxy</td></tr>
 <tr style="border-top:1px solid #f0f0f0;"><td style="padding:6px 16px;"><i>W</i><sub>0</sub>, <i>A</i>, <i>B</i>, &alpha;</td><td style="padding:6px 16px;">LoRA update <i>W</i> = <i>W</i><sub>0</sub> + (&alpha;/<i>r</i>)&thinsp;<i>BA</i>; only <i>A</i>, <i>B</i> are trained</td></tr>
 </table>
 </details>
