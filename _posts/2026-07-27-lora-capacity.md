@@ -209,7 +209,7 @@ Each curve rides the diagonal while it has room, then peels off at its own ceili
 
 ### The capacity law {#size}
 
-How can we predict the capacity of a given base and adapter pair before training? Naturally, we can turn to scaling laws. Some dimensions we discuss thus far provide valuable signals: the base parameter count $N$, number of tokens $T$ saw in pretraining, and the adapter's trainable parameter count $p \approx 2\,r\,d_\text{model} \times (\text{layers} \times \text{matrices})$, with the adapter on every attention and MLP projection. Since DataDecide supplies matched checkpoints across abundant model sizes and pretraining steps, we can fit a scaling law over some (base, rank) cell.
+How can we predict the capacity of a given base and adapter pair before training? Naturally, we can turn to scaling laws. Some dimensions we discuss thus far provide valuable signals: the base parameter count $N$, number of tokens $T$ saw in pretraining, and the adapter's trainable parameter count $p \approx 2\,r\,d_\text{model} \times (\text{layers} \times \text{matrices})$, with the adapter on every attention and MLP projection. Since DataDecide supplies matched checkpoints across abundant model sizes and pretraining steps (`dolma1_7` data recipe, roughly 100 tokens per parameter), we can fit a scaling law over every (base, rank) cell.
 
 We posit a joint power law, $C \propto N^{a}\, p^{b}\, T^{c}$, and estimate the exponents by least squares in log space,
 
@@ -541,7 +541,7 @@ If the adapter stored language the way it stores random facts, rank 1 would coll
 
 ### Super-NaturalInstructions: Massive multitask
 
-In the same spirit, Super-NLI can help us test our capacity laws in the massive multi-task setting. Languages might share a subspace, but genuinely different tasks might not. We combine eight task types from Super-NLI (arithmetic, NER, summarization, sentiment, POS tagging, QA) into one adapter. Here, the effective rank was $\approx 2$ and did not climb with the number of tasks. In fact, the effective rank fell, potentially as a shared <b>instruction following direction</b> absorbed much of the update. Our NLI unrelated tasks are not especially orthogonal in weight space.
+In the same spirit, Super-NI can help us test our capacity laws in the massive multi-task setting. Languages might share a subspace, but genuinely different tasks might not. We combine eight task types from Super-NI (arithmetic, NER, summarization, sentiment, POS tagging, QA) into one adapter. Here, the effective rank was $\approx 2$ and did not climb with the number of tasks. In fact, the effective rank fell, potentially as a shared <b>instruction following direction</b> absorbed much of the update. Our NI unrelated tasks are not especially orthogonal in weight space.
 
 ### PopQA: Long tail facts
 
