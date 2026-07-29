@@ -81,19 +81,19 @@ Morris et al. (2025) - one of my favorite papers this year! - provide a way to q
 <div style="display:flex;flex-direction:column;gap:12px;">
   <div style="display:flex;gap:14px;align-items:baseline;">
     <span style="flex:0 0 auto;font-size:17px;font-weight:700;color:#3182bd;line-height:1.4;">1</span>
-    <div style="line-height:1.6;font-size:13.5px;"><b>A LoRA adapter stores about 0.05 to 0.4 bits per trainable parameter</b> across the 20M–1B bases we test. That is an order of magnitude below the 2 to 3.6 bits per param of full training, and barely changes with rank.</div>
+    <div style="line-height:1.6;font-size:13.5px;"><b>A LoRA adapter stores about 0.05 to 0.4 bits per trainable parameter</b> across the 20M–1B base models on DataDecide. This is an order of magnitude below the 2 to 3.6 bits per param of full training estimated in previous work.</div>
   </div>
   <div style="display:flex;gap:14px;align-items:baseline;">
     <span style="flex:0 0 auto;font-size:17px;font-weight:700;color:#3182bd;line-height:1.4;">2</span>
-    <div style="line-height:1.6;font-size:13.5px;"><b>Adapter capacity scales with base compute</b>, and a stronger base lets the same adapter store more.</div>
+    <div style="line-height:1.6;font-size:13.5px;"><b>Adapter capacity scales with base model quality</b>, and a stronger base (larger size or compute) lets the same adapter store more.</div>
   </div>
   <div style="display:flex;gap:14px;align-items:baseline;">
     <span style="flex:0 0 auto;font-size:17px;font-weight:700;color:#3182bd;line-height:1.4;">3</span>
-    <div style="line-height:1.6;font-size:13.5px;"><b>One sigmoid predicts recall at 1B.</b> A scaling-law curve fitted an order of magnitude smaller extrapolates to the held-out 1B on how much model can recall.</div>
+    <div style="line-height:1.6;font-size:13.5px;"><b>A sigmoid curve can predict recall at 1B.</b> A scaling-law curve fitted an order of magnitude smaller extrapolates to the held-out 1B on how much model can recall.</div>
   </div>
   <div style="display:flex;gap:14px;align-items:baseline;">
     <span style="flex:0 0 auto;font-size:17px;font-weight:700;color:#3182bd;line-height:1.4;">4</span>
-    <div style="line-height:1.6;font-size:13.5px;"><b>Real tasks stay at effective rank 1 to 3</b>, even for multi-task instruction following and multilinguality. This yields a simple method for finding the optimal LoRA rank: train once at a generous rank, then truncate via singular value decomposition (SVD).</div>
+    <div style="line-height:1.6;font-size:13.5px;"><b>Real tasks stay at an effective rank of 1 to 3</b>, even for multi-task instruction following and multilinguality injected in post-training. This yields a simple method for finding the optimal LoRA rank: train once at a generous rank, then truncate via singular value decomposition (SVD).</div>
   </div>
 </div>
 </div>
@@ -587,7 +587,7 @@ function col(v){var t=(Math.log(Math.max(v,1e-3))/Math.LN10+3)/3;t=Math.max(0,Ma
   return 'rgb('+Math.round(a[0]+(b[0]-a[0])*u)+','+Math.round(a[1]+(b[1]-a[1])*u)+','+Math.round(a[2]+(b[2]-a[2])*u)+')';}
 var ML=168,MR=70,MT=38,MB=42,W=720,H=312,PW=W-ML-MR,PH=H-MT-MB,NC=16;
 var cw=PW/NC,rh=PH/ROWS.length;
-var s=txt(ML+PW/2,20,"Memorization fills the spectrum; other tasks collapse to one direction","#333",13,"middle",600);
+var s=txt(ML+PW/2,20,"Memorization fills the spectrum; other tasks collapse to few directions","#333",13,"middle",600);
 ROWS.forEach(function(d,i){var y=MT+i*rh;
   s+=txt(ML-9,y+rh/2+3.5,d.lab,"#333",10.5,"end");
   for(var j=0;j<NC;j++){var x=ML+j*cw;
@@ -613,7 +613,7 @@ The spectrum makes the two regimes visible at a glance. Random facts spread thei
 
 **The practical reading.** Once again, we can see that binding constraint is data and base quality, rather than adapter rank, where capability can be bought with more examples or a stronger base.
 
-**Previous works.** Morris et al. emphasize the difficulty of separating memorization from the rest of a model's behavior: *"a language model prompted to add two numbers can output the answer without having seen the equation before."* PopQA is a case in point here. Obscure facts show a large loss drop that looks like memorization, yet the update is low-rank and generalizing. Their remedy separates the two in the loss, decomposing against a reference model pretrained from scratch; our adapter's rank separates them in the weights, since memorization fills up the ranks and generalization does not. The rank-flatness itself is an older thread. Aghajanyan et al. found that fine-tuning has a tiny intrinsic dimension, and Schulman et al.'s *LoRA Without Regret* argues from capacity that rank 1 already exceeds what most post-training needs. The one place the literature sees rank clearly bite, Biderman et al.'s *LoRA Learns Less*, finds LoRA trailing full fine-tuning on code and math, with the gap closing only as rank grows — exactly the information-dense, memorization-like regime our spectrum picks out.
+**Previous works.** Morris et al. emphasize the difficulty of separating memorization from the rest of a model's behavior: *"a language model prompted to add two numbers can output the answer without having seen the equation before."* PopQA is a case in point here. Obscure facts show a large loss drop that looks like memorization, yet the update is low-rank and generalizing. Their remedy separates the two in the loss, decomposing against a reference model pretrained from scratch; our adapter's rank separates them in the weights, since memorization fills up the ranks and generalization does not. The rank-flatness itself is an older thread. Aghajanyan et al. found that fine-tuning has a tiny intrinsic dimension, and Schulman et al.'s *LoRA Without Regret* argues from capacity that rank 1 already exceeds what most post-training needs. The one place the literature sees rank clearly bite, Biderman et al.'s *LoRA Learns Less*, finds LoRA trailing full fine-tuning on code and math, with the gap closing only as rank grows. This is the information-dense, memorization regime our spectrum picks out.
 
 ## How to know the smallest rank?
 
