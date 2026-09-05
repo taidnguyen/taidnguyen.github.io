@@ -4,7 +4,7 @@ title: "Capacity of a LoRA Adapter (Part 2): Quantization"
 date: 2026-08-03
 categories: blog
 topic: capacity, LoRA, quantization, scaling
-published: true
+published: false
 permalink: /blog/lora-capacity-part2/
 description: "Push weight compression to the limit"
 read_time: 2
