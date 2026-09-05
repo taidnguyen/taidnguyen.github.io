@@ -196,9 +196,6 @@
             document.getElementById('list-projects').style.display = (t === 'projects') ? '' : 'none';
             document.getElementById('tab-blog').classList.toggle('active', t === 'blog');
             document.getElementById('tab-projects').classList.toggle('active', t === 'projects');
-              {% if post.preprint %}
-              <a href="{{post.preprint}}">preprint</a> /
-              {% endif %}
           }
         </script>
         <br>
@@ -234,6 +231,9 @@
               <!-- <em>{{post.venue}}</em>, {{ post.date | date: "%Y" }} -->
               <em>{{post.venue}}</em>
               <br>
+              {% if post.preprint %}
+              <a href="{{post.preprint}}">preprint</a> /
+              {% endif %}
               {% if post.arxiv %}
               <a href="{{post.arxiv}}">arxiv</a> /
               {% endif %}
