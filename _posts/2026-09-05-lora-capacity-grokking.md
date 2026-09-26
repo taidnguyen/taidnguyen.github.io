@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Memorization Capacity and Grokking in LoRA Adapters"
+title:  "LoRA Capacity Scaling Laws"
 categories: research
 venue: "Preprint, 2026"
 authors: <strong>Nguyen Tai</strong>
-preprint: /assets/papers/lora-capacity-grokking-2026.pdf
+preprint: /assets/papers/lora-capacity-scaling-laws-2026.pdf
 blog: /blog/lora-capacity/
 ---
