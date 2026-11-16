@@ -13,6 +13,13 @@ permalink: /top100/
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="{{ site.baseurl }}/style.css">
   <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+  <style>
+    details.countries summary { display: inline; list-style: none; cursor: pointer; }
+    details.countries summary::-webkit-details-marker { display: none; }
+    details.countries summary::after { content: "▸"; color: #2a7ae2; font-size: 1.4em; line-height: 1; margin-left: 6px; vertical-align: -2px; }
+    details.countries[open] summary::after { content: "▾"; }
+    details.countries ol { color: #666; font-size: 0.9em; margin: 4px 0 6px; padding-left: 2em; }
+  </style>
 </head>
 
 <body>
