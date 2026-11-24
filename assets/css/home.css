@@ -76,6 +76,8 @@ main a:hover { color:#123f70; }
 /* The hanging sprites sit outside the frame, so they need side margin. */
 @media (max-width:1060px) { .px-gloves, .px-sloth { display:none; } }
 /* The gloves and sloth only come out on the Miscellanea tab. */
-.px-gloves, .px-sloth { opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s; }
-.browser:has(#tab-miscellanea[aria-selected=true]) :is(.px-gloves, .px-sloth) { opacity:1; visibility:visible; }
-@media (prefers-reduced-motion:reduce) { .px, .panel-scene .lc, .panel-scene .led { animation:none; } }
+.px-knight { bottom:100%; right:90px; margin-bottom:1px; }
+.px-pho { bottom:100%; left:24px; margin-bottom:1px; }
+.px-gloves, .px-sloth, .px-knight, .px-pho { opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s; }
+.browser:has(#tab-miscellanea[aria-selected=true]) :is(.px-gloves, .px-sloth, .px-knight, .px-pho) { opacity:1; visibility:visible; }
+@media (prefers-reduced-motion:reduce) { .px, .panel-scene .lc, .panel-scene .led { animation:none !important; } }

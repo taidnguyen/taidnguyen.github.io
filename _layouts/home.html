@@ -18,7 +18,7 @@
   <meta name="author" content="{{ site.name }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href="{{ '/assets/css/home.css' | relative_url }}?v=pixel2" />
+  <link rel="stylesheet" type="text/css" href="{{ '/assets/css/home.css' | relative_url }}?v=pixel7" />
   <link rel="stylesheet" href="{{ '/assets/css/writing-tag.css' | relative_url }}">
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
   <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
@@ -39,13 +39,15 @@
 <div class="desk">
 <div class="browser">
 <img class="px px-gloves" src="{{ '/images/pixel/gloves.svg' | relative_url }}" alt="" width="42" height="52">
+<img class="px px-pho" src="{{ '/images/pixel/pho.svg' | relative_url }}" alt="" width="32" height="26">
+<img class="px px-knight" src="{{ '/images/pixel/knight.svg' | relative_url }}" alt="" width="26" height="32">
 <img class="px px-sloth" src="{{ '/images/pixel/sloth.svg' | relative_url }}" alt="" width="44" height="48">
 <!-- <img class="px px-phin" src="{{ '/images/pixel/phin.svg' | relative_url }}" alt="" width="22" height="28"> -->
 <div role="tablist" aria-label="Work">
 <button type="button" role="tab" id="tab-research" aria-controls="research" aria-selected="true" tabindex="0"><img class="tab-ico" src="{{ '/images/pixel/flask.svg' | relative_url }}" alt="" width="18" height="18">Research</button>
 <button type="button" role="tab" id="tab-writing" aria-controls="writing" aria-selected="false" tabindex="-1"><img class="tab-ico" src="{{ '/images/pixel/pencil.svg' | relative_url }}" alt="" width="18" height="18">Writing</button>
 <button type="button" role="tab" id="tab-projects" aria-controls="projects" aria-selected="false" tabindex="-1"><img class="tab-ico" src="{{ '/images/pixel/floppy.svg' | relative_url }}" alt="" width="18" height="18">Past projects</button>
-<button type="button" role="tab" id="tab-miscellanea" aria-controls="miscellanea" aria-selected="false" tabindex="-1"><img class="tab-ico" src="{{ '/images/pixel/ball.svg' | relative_url }}" alt="" width="18" height="18">Miscellanea</button>
+<button type="button" role="tab" id="tab-miscellanea" aria-controls="miscellanea" aria-selected="false" tabindex="-1"><img class="tab-ico" src="{{ '/images/pixel/racket.svg' | relative_url }}" alt="" width="18" height="18">Miscellanea</button>
 </div>
 <section hidden id="writing" role="tabpanel" aria-labelledby="tab-writing" tabindex="0"><ul>
 {% for post in site.categories.blog %}
@@ -82,7 +84,8 @@
 {% endfor %}
 </ul></section>
 <section hidden id="miscellanea" role="tabpanel" aria-labelledby="tab-miscellanea" tabindex="0">
-<p>I enjoy boxing and tennis in my free time. I am a fan of the Seahawks, and try to travel as much as I can.</p>
+<p>I enjoy boxing, tennis, food, and travel in my free time. I am a huge fan of the Seahawks and Arsenal.</p>
+<p>At the moment, I am trying to learn chess<span class="chess-rating" data-site="chesscom" data-user="gentlechrysanthemum"></span>.</p>
 <p>My Top 100 <a href="/top100/">list</a> inspired by Huyền Chip.</p>
 </section>
 </div></div>
@@ -110,4 +113,23 @@ for (const [index, tab] of tabs.entries()) {
 }
 const linkedTab = tabs.find(tab => '#' + tab.getAttribute('aria-controls') === location.hash);
 if (linkedTab) selectTab(linkedTab);
+// Live chess rating. Set data-site ("lichess" or "chesscom") and data-user on .chess-rating.
+const chess = document.querySelector('.chess-rating');
+if (chess && chess.dataset.user) {
+  const { site, user } = chess.dataset;
+  const lichess = site === 'lichess';
+  const api = lichess ? `https://lichess.org/api/user/${user}` : `https://api.chess.com/pub/player/${user.toLowerCase()}/stats`;
+  const profile = lichess ? `https://lichess.org/@/${user}` : `https://www.chess.com/member/${user}`;
+  fetch(api)
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => {
+      const rating = lichess ? d.perfs?.rapid?.rating : d.chess_rapid?.last?.rating;
+      if (!rating) return;
+      const link = document.createElement('a');
+      link.href = profile;
+      link.textContent = rating;
+      chess.append(` (${lichess ? 'Lichess' : 'Chess.com'} rapid: `, link, ')');
+    })
+    .catch(() => {});
+}
 </script></body></html>
