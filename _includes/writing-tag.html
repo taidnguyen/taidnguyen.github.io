@@ -1,2 +1,2 @@
-{%- assign label = include.kind | default: 'Technical' -%}
+{%- assign label = include.kind | default: 'Blog' -%}
 <span class="writing-tag writing-tag--{{ label | slugify }}">{{ label | escape }}</span>

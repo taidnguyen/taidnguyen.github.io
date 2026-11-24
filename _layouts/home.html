@@ -18,7 +18,7 @@
   <meta name="author" content="{{ site.name }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href="{{ '/assets/css/home.css' | relative_url }}?v=blue1" />
+  <link rel="stylesheet" type="text/css" href="{{ '/assets/css/home.css' | relative_url }}?v=pixel2" />
   <link rel="stylesheet" href="{{ '/assets/css/writing-tag.css' | relative_url }}">
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
   <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
@@ -26,23 +26,26 @@
   {% feed_meta %}
 </head>
 <body><main>
-<header><div><h1>Tai Nguyen</h1>
+<header><div><h1>Tai Nguyen {% include desk-scene.svg %}</h1>
 <p>I am Tai (Đức Tài), a research engineer at Apple . I am working on multimodal and on-device language models for Apple Intelligence features.</p>
-<p>Previously, I got my MS from the University of Pennsylvania, where I got started on research with <a href="https://www.cis.upenn.edu/~exwong/">Eric Wong</a> and <a href="https://www.cis.upenn.edu/~ccb/">Chris Callison-Burch</a>. I am also fortunate to work with <a href="https://benbogin.github.io/">Ben Bogin</a> from Ai2.</p>
+<p>Previously, I got my MS from the University of Pennsylvania, where I got started on research with <a href="https://www.cis.upenn.edu/~exwong/">Eric Wong</a>. I am also fortunate to work with <a href="https://benbogin.github.io/">Ben Bogin</a> from Ai2.</p>
+<p>I am interested in the open science of LLMs [<a href="https://arxiv.org/abs/2504.11393">DataDecide</a>, <a href="https://arxiv.org/abs/2302.11042">In-context Influences</a>], connections between stages of training [<a href="/assets/papers/lora-memorization-scaling-laws-2026.pdf">LoRA Capacity</a>], and benchmarks/algorithms for diversity [<a href="https://arxiv.org/abs/2502.13595">MMTEB</a>, <a href="https://arxiv.org/abs/2609.04173">LTB</a>].</p>
 <!-- <p>Before that, I helped build an analytics tool to help detect and diagnose mainframe server failures at <a href="https://www.ibm.com/topics/mainframe">IBM Systems</a>.</p> -->
 <!-- Before that, I studied Economics at the wonderful Haverford College and wrote my undergraduate <a href="https://scholarship.tricolib.brynmawr.edu/handle/10066/21740">thesis</a> on the impact of Airbnb on welfare. -->
-<p>I grew up in Saigon, Vietnam 🇻🇳.</p>
+<p>I grew up in Saigon, Vietnam 🇻🇳. Please reach out if you would like to chat or collaborate.</p>
 <nav aria-label="Contact and profiles"><a href="mailto:tainguyen7597@gmail.com">Email</a><a href="https://github.com/taidnguyen">GitHub</a><a href="https://scholar.google.com/citations?user=hR_o5VoAAAAJ">Scholar</a><a href="https://huggingface.co/taidng">Hugging Face</a><a href="https://x.com/taidng">X</a></nav></div>
 <figure><img src="/images/desk-portrait.jpg?v=2" width="378" height="504" style="height:auto" alt="Tai Nguyen"><figcaption>Photo by Grace Pindzola</figcaption></figure>
-<img class="panel-scene" src="{{ '/images/desk-plant.svg' | relative_url }}" alt="Pixel computer showing a falling training-loss curve beside a potted plant" width="76" height="64">
 </header>
 <div class="desk">
 <div class="browser">
+<img class="px px-gloves" src="{{ '/images/pixel/gloves.svg' | relative_url }}" alt="" width="42" height="52">
+<img class="px px-sloth" src="{{ '/images/pixel/sloth.svg' | relative_url }}" alt="" width="44" height="48">
+<!-- <img class="px px-phin" src="{{ '/images/pixel/phin.svg' | relative_url }}" alt="" width="22" height="28"> -->
 <div role="tablist" aria-label="Work">
-<button type="button" role="tab" id="tab-research" aria-controls="research" aria-selected="true" tabindex="0">Research</button>
-<button type="button" role="tab" id="tab-writing" aria-controls="writing" aria-selected="false" tabindex="-1">Writing</button>
-<button type="button" role="tab" id="tab-projects" aria-controls="projects" aria-selected="false" tabindex="-1">Past projects</button>
-<button type="button" role="tab" id="tab-miscellanea" aria-controls="miscellanea" aria-selected="false" tabindex="-1">Miscellanea</button>
+<button type="button" role="tab" id="tab-research" aria-controls="research" aria-selected="true" tabindex="0"><img class="tab-ico" src="{{ '/images/pixel/flask.svg' | relative_url }}" alt="" width="18" height="18">Research</button>
+<button type="button" role="tab" id="tab-writing" aria-controls="writing" aria-selected="false" tabindex="-1"><img class="tab-ico" src="{{ '/images/pixel/pencil.svg' | relative_url }}" alt="" width="18" height="18">Writing</button>
+<button type="button" role="tab" id="tab-projects" aria-controls="projects" aria-selected="false" tabindex="-1"><img class="tab-ico" src="{{ '/images/pixel/floppy.svg' | relative_url }}" alt="" width="18" height="18">Past projects</button>
+<button type="button" role="tab" id="tab-miscellanea" aria-controls="miscellanea" aria-selected="false" tabindex="-1"><img class="tab-ico" src="{{ '/images/pixel/ball.svg' | relative_url }}" alt="" width="18" height="18">Miscellanea</button>
 </div>
 <section hidden id="writing" role="tabpanel" aria-labelledby="tab-writing" tabindex="0"><ul>
 {% for post in site.categories.blog %}
@@ -60,7 +63,7 @@
   {% assign paper = post.preprint | default: post.arxiv | default: post.website | default: post.url %}
   <li>
     <h3><a href="{{ paper }}">{{ post.title | escape }}</a></h3>
-    <p>{{ post.venue | replace: '<br>+ ', ' · ' }}</p>
+    <p>{{ post.venue | replace: '<br>+ ', ' + ' }}</p>
     <p class="authors">{{ post.authors }}</p>
     {% include work-links.html post=post keys='preprint arxiv code website blog huggingface press poster youtube' %}
   </li>
