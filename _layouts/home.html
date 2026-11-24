@@ -18,14 +18,16 @@
   <meta name="author" content="{{ site.name }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href="{{ '/assets/css/home.css' | relative_url }}?v=pixel10" />
+  <link rel="stylesheet" type="text/css" href="{{ '/assets/css/home.css' | relative_url }}?v=pixel13" />
   <link rel="stylesheet" href="{{ '/assets/css/writing-tag.css' | relative_url }}">
+  <script>try { if (localStorage.getItem('toys') === 'on') document.documentElement.classList.add('toys-on'); } catch (e) {}</script>
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
   <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
 
   {% feed_meta %}
 </head>
 <body><main>
+<div class="toy-row"><span id="toy-label">Play</span><button type="button" class="knob" role="switch" aria-checked="false" aria-labelledby="toy-label"></button></div>
 <header><div><h1>Tai Nguyen {% include desk-scene.svg %}</h1>
 <p>I am Tai (Đức Tài), a research engineer at Apple . I am working on multimodal and on-device language models for Apple Intelligence features.</p>
 <p>Previously, I got my MS from the University of Pennsylvania, where I got started on research with <a href="https://www.cis.upenn.edu/~exwong/">Eric Wong</a>. I am also fortunate to work with <a href="https://benbogin.github.io/">Ben Bogin</a> from Ai2.</p>
@@ -113,6 +115,20 @@ for (const [index, tab] of tabs.entries()) {
 }
 const linkedTab = tabs.find(tab => '#' + tab.getAttribute('aria-controls') === location.hash);
 if (linkedTab) selectTab(linkedTab);
+// Pixel art switch for the whole page. Off by default; each visitor's choice is remembered.
+const knob = document.querySelector('.knob');
+const setToys = on => {
+  document.documentElement.classList.toggle('toys-on', on);
+  knob.setAttribute('aria-checked', String(on));
+};
+let savedToys = null;
+try { savedToys = localStorage.getItem('toys'); } catch (e) {}
+setToys(savedToys === 'on');
+knob.addEventListener('click', () => {
+  const on = knob.getAttribute('aria-checked') !== 'true';
+  setToys(on);
+  try { localStorage.setItem('toys', on ? 'on' : 'off'); } catch (e) {}
+});
 // Live chess rating. Set data-site ("lichess" or "chesscom") and data-user on .chess-rating.
 const chess = document.querySelector('.chess-rating');
 if (chess && chess.dataset.user) {

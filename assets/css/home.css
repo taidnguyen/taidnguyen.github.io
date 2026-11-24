@@ -122,5 +122,16 @@ main a:hover { color:#123f70; }
 }
 .px-pho { bottom:100%; left:24px; margin-bottom:1px; }
 .px-gloves, .px-sloth, .px-knight, .px-pho { opacity:0; visibility:hidden; transition:opacity .35s, visibility .35s; }
-.browser:has(#tab-miscellanea[aria-selected=true]) :is(.px-gloves, .px-sloth, .px-knight, .px-pho) { opacity:1; visibility:visible; }
+/* ...and only when the Pixel switch is on. */
+.toys-on .browser:has(#tab-miscellanea[aria-selected=true]) :is(.px-gloves, .px-sloth, .px-knight, .px-pho) { opacity:1; visibility:visible; }
+main { position:relative; }
+/* The Play switch sits in the page's top-right corner. */
+.toy-row { position:absolute; top:clamp(4px,2vw,26px); right:clamp(16px,4vw,32px); display:flex; align-items:center; gap:7px; font:500 .78rem ui-monospace,monospace; color:var(--muted); }
+/* With the switch off, the page has no pixel art at all. */
+html:not(.toys-on) :is(.panel-scene, .tab-ico) { display:none; }
+.knob { position:relative; width:30px; height:16px; padding:0; background:#e3e9ef; box-shadow:inset 0 0 0 2px #435265; }
+.knob::after { content:""; position:absolute; top:4px; left:4px; width:8px; height:8px; background:#435265; transition:left .15s steps(2); }
+.knob[aria-checked=true] { background:#cfe8c4; }
+.knob[aria-checked=true]::after { left:18px; }
+.knob:hover { text-decoration:none; }
 @media (prefers-reduced-motion:reduce) { .px, .panel-scene .lc, .panel-scene .led { animation:none !important; } }
