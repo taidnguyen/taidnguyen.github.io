@@ -40,6 +40,7 @@
   {% endif %}
 
   <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/writing.css">
+  <link rel="stylesheet" href="{{ '/assets/css/writing-tag.css' | relative_url }}">
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 
@@ -87,7 +88,7 @@
     <header>
       <h1>{{ page.title | escape }}</h1>
       {% if page.kind == 'Essay' %}<p>{{ page.description | escape }}</p>{% endif %}
-      <p class="byline">{% if page.kind == 'Essay' %}{{ site.name }} · Essay · Submitted {{ page.date | date: '%B %Y' }}{% else %}Technical · {{ page.date | date: '%B %-d, %Y' }}{% if page.read_time %} · {{ page.read_time }} min read{% endif %}{% endif %}</p>
+      <p class="byline">{% if page.kind == 'Essay' %}{{ site.name }} · {% endif %}{% include writing-tag.html kind=page.kind %} {% if page.kind == 'Essay' %}Submitted {{ page.date | date: '%B %Y' }}{% else %}{{ page.date | date: '%B %-d, %Y' }}{% if page.read_time %} · {{ page.read_time }} min read{% endif %}{% endif %}</p>
     </header>
     <div class="blog-content">{{ content }}</div>
   </article></main>

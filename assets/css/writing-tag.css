@@ -1,0 +1,15 @@
+.writing-tag {
+  display:inline-block;
+  padding:0 .45em;
+  border:1px solid #bccfe0;
+  border-radius:3px;
+  background:#edf4fa;
+  color:#244d72;
+  font:500 .75rem/1.5 ui-monospace,monospace;
+  white-space:nowrap;
+}
+.writing-tag--essay {
+  border-color:#d9c9b5;
+  background:#f8f3eb;
+  color:#684c32;
+}
