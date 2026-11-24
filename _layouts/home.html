@@ -49,14 +49,15 @@
   <li>
     <div class="row">
       <h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3>
-      <small>{{ post.kind | default: 'Technical' }} · {{ post.date | date: '%b %Y' }}</small>
+      <small>{% include writing-tag.html kind=post.kind %} <time datetime="{{ post.date | date: '%Y-%m-%d' }}">{{ post.date | date: '%b %Y' }}</time></small>
     </div>
     <p>{{ post.list_description | default: post.description | escape }}</p>
   </li>
 {% endfor %}
 </ul></section>
 <section id="research" role="tabpanel" aria-labelledby="tab-research" tabindex="0"><ul>
-{% for post in site.categories.research %}
+{% assign research = site.categories.research | sort: 'order', 'last' %}
+{% for post in research %}
   {% assign paper = post.preprint | default: post.arxiv | default: post.website | default: post.url %}
   <li>
     <h3><a href="{{ paper }}">{{ post.title | escape }}</a></h3>

@@ -6,6 +6,7 @@ title:  "In-context Example Selection with Influences"
 # course: " Berkeley"
 # author: "Tai Nguyen and Eric Wong"
 categories: research
+order: 3
 # subtitle: "Invited Workshop Talk"
 venue: "arXiv 2024"
 # slides: /pdfs/hands2015.pdf
