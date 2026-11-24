@@ -1,15 +1,11 @@
+/* Matches the .oral venue tag in home.css */
 .writing-tag {
   display:inline-block;
-  padding:0 .45em;
-  border:1px solid #bccfe0;
+  padding:.03em .45em;
+  border:1px solid #adbed0;
   border-radius:3px;
-  background:#edf4fa;
-  color:#244d72;
-  font:500 .75rem/1.5 ui-monospace,monospace;
+  color:#234e77;
+  font:600 .75rem/1.5 ui-monospace,monospace;
+  vertical-align:.08em;
   white-space:nowrap;
-}
-.writing-tag--essay {
-  border-color:#d9c9b5;
-  background:#f8f3eb;
-  color:#684c32;
 }

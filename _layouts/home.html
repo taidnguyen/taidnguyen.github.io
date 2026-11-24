@@ -56,8 +56,7 @@
 {% endfor %}
 </ul></section>
 <section id="research" role="tabpanel" aria-labelledby="tab-research" tabindex="0"><ul>
-{% assign research = site.categories.research | sort: 'order', 'last' %}
-{% for post in research %}
+{% for post in site.categories.research %}
   {% assign paper = post.preprint | default: post.arxiv | default: post.website | default: post.url %}
   <li>
     <h3><a href="{{ paper }}">{{ post.title | escape }}</a></h3>

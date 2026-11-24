@@ -5,7 +5,6 @@ title:  "DataDecide: How to Predict Best Pretraining Data with Small Experiments
 # image: /images/gina-motes.jpg
 # course: " Berkeley"
 categories: research
-order: 2
 # subtitle: ""
 venue: "ICML 2025<br>+ DataWorld Workshop <span class=\"oral\">Oral</span>"
 authors: Ian Magnusson*, <strong>Nguyen Tai*</strong>, Ben Bogin*, David Heineman, Jena D Hwang, Luca Soldaini, Akshita Bhagia, Jiacheng Liu, Dirk Groeneveld, Oyvind Tafjord, Noah A Smith, Pang Wei Koh, Jesse Dodge

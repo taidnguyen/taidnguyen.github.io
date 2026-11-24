@@ -6,7 +6,6 @@ title:  "Explanation-based Finetuning Makes Models More Robust to Spurious Cues"
 # course: " Berkeley"
 # author: "Tai Nguyen and Eric Wong"
 categories: research
-order: 6
 # subtitle: "Invited Workshop Talk"
 venue: "ACL 2023"
 # slides: /pdfs/hands2015.pdf

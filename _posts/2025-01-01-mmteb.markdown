@@ -6,7 +6,6 @@ title:  "MMTEB: Massive Multilingual Text Embedding Benchmark"
 # course: " Berkeley"
 # author: "Tai Nguyen and Eric Wong"
 categories: research
-order: 4
 # subtitle: "Invited Workshop Talk"
 venue: "ICLR 2025"
 # slides: /pdfs/hands2015.pdf
