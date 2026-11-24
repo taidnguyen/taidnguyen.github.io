@@ -1,43 +1,19 @@
----
-title: Top 100
-permalink: /top100/
----
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Top 100 | {{ site.name }}</title>
-
-  <meta name="author" content="{{ site.name }}">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="{{ site.baseurl }}/style.css">
-  <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
-  <style>
-    details.countries summary { display: inline; list-style: none; cursor: pointer; }
-    details.countries summary::-webkit-details-marker { display: none; }
-    details.countries summary::after { content: "▸"; color: #2a7ae2; font-size: 1.4em; line-height: 1; margin-left: 6px; vertical-align: -2px; }
-    details.countries[open] summary::after { content: "▾"; }
-    details.countries ol { color: #666; font-size: 0.9em; margin: 4px 0 6px; padding-left: 2em; }
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Top 100 · Tai Nguyen</title>
+<style>
+body { background:#fcfdff; color:#202934; font:1rem/1.55 Lato,system-ui,sans-serif; max-width:44rem; margin:auto; padding:clamp(24px,5vw,56px) 20px; }
+h1 { margin:20px 0 8px; font-size:2.4rem; line-height:1.1; letter-spacing:-.045em; }
+a, summary { color:#215c94; text-underline-offset:3px; }
+summary { cursor:pointer; }
+#bucket-list { padding:12px 0 0 2.3em; border-top:1px solid #dbe2e9; }
+#bucket-list > li { padding:3px 0; }
+#bucket-list > li::marker { font: .85rem ui-monospace,monospace; color:#526172; }
+</style>
 </head>
-
-<body>
-  <table style="width:100%;max-width:800px;border:0;border-spacing:0;border-collapse:separate;margin-right:auto;margin-left:auto;">
-    <tr style="padding:0px">
-      <td style="padding:0px">
-        <table style="width:100%;border:0;border-spacing:0;border-collapse:separate;margin-right:auto;margin-left:auto;">
-          <tr>
-            <td style="padding:1.2%;width:100%;vertical-align:middle">
-                <h1>{{ page.title }}</h1>
-                {{ content }}
-                <br>
-                <p><a href="/">← Back to Home</a></p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
+<body><nav><a href="/#miscellanea">Back to Miscellanea</a></nav>
+<main><h1>{{ page.title | escape }}</h1>
+{{ content }}
+</main></body></html>

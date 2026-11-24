@@ -1,5 +1,6 @@
 ---
-layout: blog
+layout: writing
+list_description: How much can a LoRA adapter memorize? Experiments with DataDecide checkpoints.
 title: "Capacity of a LoRA Adapter (Part 1)"
 date: 2026-07-27
 categories: blog

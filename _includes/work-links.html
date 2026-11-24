@@ -1,0 +1,8 @@
+{% assign keys = include.keys | split: ' ' %}
+<div class="actions">
+  {% for key in keys %}
+    {% if include.post[key] %}
+      <a href="{{ include.post[key] }}">{% if key == 'feature' %}feature article{% else %}{{ key }}{% endif %}</a>
+    {% endif %}
+  {% endfor %}
+</div>

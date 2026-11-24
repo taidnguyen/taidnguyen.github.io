@@ -1,5 +1,6 @@
 ---
-layout: blog
+layout: writing
+list_description: What happens when a model trained on pre-1931 text grades its own arithmetic?
 title: "Self-play on a Vintage Language Model"
 date: 2026-06-14
 categories: blog

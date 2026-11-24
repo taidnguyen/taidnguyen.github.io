@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XPMB0SVKEY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-XPMB0SVKEY');
+  </script>
+  <title>{{ site.name }}</title>
+
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+  <meta name="author" content="{{ site.name }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" type="text/css" href="{{ '/assets/css/home.css' | relative_url }}" />
+  <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+  {% feed_meta %}
+</head>
+<body><main>
+<header><div><h1>Tai Nguyen</h1>
+<p>I am Tai (Đức Tài), a research engineer at Apple . I am working on multimodal and on-device language models for Apple Intelligence features.</p>
+<p>Previously, I got my MS from the University of Pennsylvania, where I got started on research with <a href="https://www.cis.upenn.edu/~exwong/">Eric Wong</a> and <a href="https://www.cis.upenn.edu/~ccb/">Chris Callison-Burch</a>. I am also fortunate to work with <a href="https://benbogin.github.io/">Ben Bogin</a> from Ai2.</p>
+<!-- <p>Before that, I helped build an analytics tool to help detect and diagnose mainframe server failures at <a href="https://www.ibm.com/topics/mainframe">IBM Systems</a>.</p> -->
+<!-- Before that, I studied Economics at the wonderful Haverford College and wrote my undergraduate <a href="https://scholarship.tricolib.brynmawr.edu/handle/10066/21740">thesis</a> on the impact of Airbnb on welfare. -->
+<p>I grew up in Saigon, Vietnam 🇻🇳.</p>
+<nav aria-label="Contact and profiles"><a href="mailto:tainguyen7597@gmail.com">Email</a><a href="https://github.com/taidnguyen">GitHub</a><a href="https://scholar.google.com/citations?user=hR_o5VoAAAAJ">Scholar</a><a href="https://huggingface.co/taidng">Hugging Face</a><a href="https://x.com/taidng">X</a></nav></div>
+<figure><img src="/images/desk-portrait.jpg" alt="Tai Nguyen"><figcaption>Photo by Grace Pindzola</figcaption></figure></header>
+<div class="desk"><svg aria-hidden="true" width="108" height="84" viewBox="0 0 36 28" shape-rendering="crispEdges">
+                  <g fill="#313a48">
+                    <path d="M3 3h21v1h1v15h-1v1H3v-1H2V4h1zM10 20h6v2h4v1H6v-1h4z"/>
+                    <path d="M1 24h23v1h1v2H0v-2h1z"/>
+                  </g>
+                  <path fill="#d9d3b8" d="M3 4h21v14H3z"/>
+                  <path fill="#f4efdc" d="M3 4h20v1H4v12H3z"/>
+                  <path fill="#817f75" d="M4 18h20v1H4zM11 20h4v2h-4z"/>
+                  <path fill="#244448" d="M5 6h17v10H5z"/>
+                  <path fill="#162f35" d="M5 6h17v1H6v9H5z"/>
+                  <path fill="#9de3aa" d="M7 13h3v-1h2v1h2v-3h3V9h3v1h-2v1h-3v3h-4v-1h-1v1H7z"/>
+                  <path fill="#72988b" d="M19 17h2v1h-2z"/>
+                  <path fill="#bebba7" d="M2 24h20v1H2zM1 25h22v1H1z"/>
+                  <path fill="#777b78" d="M3 25h2v1H3zm4 0h2v1H7zm4 0h2v1h-2zm4 0h5v1h-5z"/>
+                  <path fill="#43755a" d="M29 13h2v8h-2zM26 14h2v1h2v3h-2v-2h-2zM31 12h2v-2h2v4h-2v2h-2z"/>
+                  <path fill="#88ad69" d="M28 10h2v2h1v3h-2v-3h-1zM33 10h2v1h-2z"/>
+                  <path fill="#965f49" d="M26 20h9v2h-1v4h-1v1h-5v-1h-1v-4h-1z"/>
+                  <path fill="#d59a72" d="M26 20h9v1h-9zm2 2h2v3h-2z"/>
+                </svg>
+<div class="browser">
+<div role="tablist" aria-label="Work">
+<button type="button" role="tab" id="tab-research" aria-controls="research" aria-selected="true" tabindex="0">Research</button>
+<button type="button" role="tab" id="tab-writing" aria-controls="writing" aria-selected="false" tabindex="-1">Writing</button>
+<button type="button" role="tab" id="tab-projects" aria-controls="projects" aria-selected="false" tabindex="-1">Past projects</button>
+<button type="button" role="tab" id="tab-miscellanea" aria-controls="miscellanea" aria-selected="false" tabindex="-1">Miscellanea</button>
+</div>
+<section hidden id="writing" role="tabpanel" aria-labelledby="tab-writing" tabindex="0"><ul>
+{% for post in site.categories.blog %}
+  <li>
+    <div class="row">
+      <h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3>
+      <small>{{ post.kind | default: 'Technical' }} · {{ post.date | date: '%b %Y' }}</small>
+    </div>
+    <p>{{ post.list_description | default: post.description | escape }}</p>
+  </li>
+{% endfor %}
+</ul></section>
+<section id="research" role="tabpanel" aria-labelledby="tab-research" tabindex="0"><ul>
+{% for post in site.categories.research %}
+  {% assign paper = post.preprint | default: post.arxiv | default: post.website | default: post.url %}
+  <li>
+    <h3><a href="{{ paper }}">{{ post.title | escape }}</a></h3>
+    <p>{{ post.venue | replace: '<br>+ ', ' · ' }}</p>
+    <p class="authors">{{ post.authors }}</p>
+    {% include work-links.html post=post keys='preprint arxiv code website blog huggingface press poster youtube' %}
+  </li>
+{% endfor %}
+</ul></section>
+<section hidden id="projects" role="tabpanel" aria-labelledby="tab-projects" tabindex="0"><ul>
+{% for post in site.categories.project %}
+  <li>
+    <div class="row">
+      <h3><a href="{{ post.website | default: post.url }}">{{ post.title | escape }}</a></h3>
+      <small>{{ post.date | date: '%Y' }}</small>
+    </div>
+    <p>{{ post.excerpt | strip_html | strip }}</p>
+    {% include work-links.html post=post keys='video code feature paper patent poster press slides writeup' %}
+  </li>
+{% endfor %}
+</ul></section>
+<section hidden id="miscellanea" role="tabpanel" aria-labelledby="tab-miscellanea" tabindex="0">
+<p>I enjoy boxing and tennis in my free time. I am a fan of the Seahawks, and try to travel as much as I can.</p>
+<p>My Top 100 <a href="/top100/">list</a> inspired by Huyền Chip.</p>
+</section>
+</div></div>
+</main>
+<script>
+const tabs = Array.from(document.querySelectorAll('[role=tab]'));
+function selectTab(tab) {
+  for (const item of tabs) {
+    const active = item === tab;
+    item.setAttribute('aria-selected', String(active));
+    item.tabIndex = active ? 0 : -1;
+    document.getElementById(item.getAttribute('aria-controls')).hidden = !active;
+  }
+}
+for (const [index, tab] of tabs.entries()) {
+  tab.addEventListener('click', () => selectTab(tab));
+  tab.addEventListener('keydown', event => {
+    const destinations = {ArrowDown:(index+1)%tabs.length, ArrowUp:(index+tabs.length-1)%tabs.length, ArrowRight:(index+1)%tabs.length, ArrowLeft:(index+tabs.length-1)%tabs.length, Home:0, End:tabs.length-1};
+    if (!(event.key in destinations)) return;
+    event.preventDefault();
+    const next = tabs[destinations[event.key]];
+    selectTab(next);
+    next.focus();
+  });
+}
+const linkedTab = tabs.find(tab => '#' + tab.getAttribute('aria-controls') === location.hash);
+if (linkedTab) selectTab(linkedTab);
+</script></body></html>
