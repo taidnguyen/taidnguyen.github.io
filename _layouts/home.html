@@ -18,7 +18,7 @@
   <meta name="author" content="{{ site.name }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" type="text/css" href="{{ '/assets/css/home.css' | relative_url }}?v=pixel15" />
+  <link rel="stylesheet" type="text/css" href="{{ '/assets/css/home.css' | relative_url }}?v=pixel16" />
   <link rel="stylesheet" href="{{ '/assets/css/writing-tag.css' | relative_url }}">
   <script>try { if (localStorage.getItem('toys') === 'on') document.documentElement.classList.add('toys-on'); } catch (e) {}</script>
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
@@ -37,6 +37,9 @@
 <nav aria-label="Contact and profiles"><a href="mailto:tainguyen7597@gmail.com">Email</a><a href="https://github.com/taidnguyen">GitHub</a><a href="https://scholar.google.com/citations?user=hR_o5VoAAAAJ">Scholar</a><a href="https://huggingface.co/taidng">Hugging Face</a><a href="https://x.com/taidng">X</a></nav></div>
 <figure><img src="/images/desk-portrait.jpg?v=2" width="378" height="504" style="height:auto" alt="Tai Nguyen"><figcaption>Photo by Grace Pindzola</figcaption></figure>
 </header>
+<section class="news" aria-labelledby="news-title"><h2 id="news-title">News</h2><ul>
+{% for item in site.data.news limit:5 %}<li><small>{{ item.date }}</small><span>{% if item.url and item.link %}{% capture linked %}<a href="{{ item.url }}">{{ item.link }}</a>{% endcapture %}{{ item.text | replace: item.link, linked }}{% else %}{{ item.text }}{% endif %}</span></li>
+{% endfor %}</ul></section>
 <div class="desk">
 <div class="browser">
 <div class="toy-row"><span id="toy-label">Play</span><button type="button" class="knob" role="switch" aria-checked="false" aria-labelledby="toy-label"></button></div>

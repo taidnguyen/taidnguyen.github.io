@@ -1,0 +1,12 @@
+# Newest first. The homepage shows the first five.
+# `link` is the phrase inside `text` that gets linked to `url`.
+- date: Jan 2027
+  text: Working as a MATS Fellow with Dylan Sam (OpenAI)
+- date: Dec 2026
+  text: 'Presenting "Memorization and Grokking in LoRA adapters" at NeurIPS in Sydney, Australia'
+  link: Memorization and Grokking in LoRA adapters
+  url: /assets/papers/lora-memorization-scaling-laws-2026.pdf
+- date: Sep 2026
+  text: Contributed vintage 1930s Vietnamese samples to Last Translation Bench
+  link: Last Translation Bench
+  url: https://arxiv.org/abs/2609.04173
